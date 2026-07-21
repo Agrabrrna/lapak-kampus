@@ -6,3 +6,156 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  ADMIN
+  PENJUAL
+  PEMBELI
+}
+
+enum Condition {
+  BARU
+  BEKAS
+}
+
+enum OrderStatus {
+  PENDING
+  DIPROSES
+  SELESAI
+  DIBATALKAN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(PEMBELI)
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products      Product[]
+  buyerOrders   Order[]        @relation("BuyerOrders")
+  sellerOrders  Order[]        @relation("SellerOrders")
+  reviews       Review[]
+  wishlists     Wishlist[]
+  sentChats     Chat[]         @relation("SentChats")
+  receivedChats Chat[]         @relation("ReceivedChats")
+  notifications Notification[]
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  userId      String
+  categoryId  String
+  name        String
+  slug        String    @unique
+  description String?   @db.Text
+  price       Decimal   @db.Decimal(10, 2)
+  stock       Int
+  condition   Condition
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id])
+  category     Category       @relation(fields: [categoryId], references: [id])
+  images       ProductImage[]
+  orderDetails OrderDetail[]
+  reviews      Review[]
+  wishlists    Wishlist[]
+  chats        Chat[]
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  imagePath String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  buyerId    String
+  sellerId   String
+  status     OrderStatus @default(PENDING)
+  totalPrice Decimal     @db.Decimal(10, 2)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  buyer        User          @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller       User          @relation("SellerOrders", fields: [sellerId], references: [id])
+  orderDetails OrderDetail[]
+}
+
+model OrderDetail {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  subtotal  Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  userId    String
+  rating    Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Chat {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  productId  String?
+  message    String   @db.Text
+  createdAt  DateTime @default(now())
+
+  sender   User     @relation("SentChats", fields: [senderId], references: [id])
+  receiver User     @relation("ReceivedChats", fields: [receiverId], references: [id])
+  product  Product? @relation(fields: [productId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
