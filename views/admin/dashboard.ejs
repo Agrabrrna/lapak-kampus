@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">KampusLapak (Admin)</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="nav-link text-white me-3">Halo, <%= user.name %> (Role: <%= user.role %>)</span>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/auth/logout" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-4 shadow-sm">
+                    <h2 class="text-primary mb-3">Selamat Datang di Halaman Admin</h2>
+                    <p class="lead">Anda masuk sebagai administrator KampusLapak. Di sini Anda dapat memantau seluruh transaksi dan mengelola pengguna platform.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-primary text-white p-3">
+                                <h5>Kelola Pengguna</h5>
+                                <p>Lihat dan modifikasi data mahasiswa</p>
+                                <a href="#" class="btn btn-light btn-sm text-primary">Buka Menu</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-success text-white p-3">
+                                <h5>Kelola Kategori</h5>
+                                <p>Tambah / edit kategori produk kampus</p>
+                                <a href="#" class="btn btn-light btn-sm text-success">Buka Menu</a>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-info text-white p-3">
+                                <h5>Pantau Transaksi</h5>
+                                <p>Memonitor aktivitas checkout & order</p>
+                                <a href="#" class="btn btn-light btn-sm text-info">Buka Menu</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

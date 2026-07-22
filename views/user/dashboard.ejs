@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link class="bootstrap-css" rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">KampusLapak</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="nav-link text-white me-3">Halo, <%= user.name %> (Role: <%= user.role %>)</span>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/auth/logout" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-4 shadow-sm">
+                    <h2 class="text-primary mb-3">Selamat Datang di KampusLapak!</h2>
+                    <p class="lead">Anda terdaftar sebagai <strong><%= user.role %></strong>. Anda sekarang bisa mengakses fitur-fitur marketplace sesuai kebutuhan Anda.</p>
+                    
+                    <div class="row mt-4">
+                        <% if (user.role === 'PENJUAL') { %>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary p-3">
+                                    <h5>Kelola Produk Saya</h5>
+                                    <p>Unggah buku, laptop, atau alat praktikum yang ingin Anda jual.</p>
+                                    <a href="/seller/products" class="btn btn-primary btn-sm">Buka Produk Saya</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-success p-3">
+                                    <h5>Tambah Produk</h5>
+                                    <p>Mulai jual barang baru.</p>
+                                    <a href="/seller/products/add" class="btn btn-success btn-sm">Tambah Baru</a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary p-3">
+                                    <h5>Cari Produk</h5>
+                                    <p>Temukan buku, laptop, dan kebutuhan praktikum murah di sini.</p>
+                                    <a href="#" class="btn btn-primary btn-sm">Mulai Belanja</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-success p-3">
+                                    <h5>Wishlist</h5>
+                                    <p>Lihat barang favorit yang Anda simpan.</p>
+                                    <a href="#" class="btn btn-success btn-sm">Lihat Wishlist</a>
+                                </div>
+                            </div>
+                        <% } %>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-info p-3">
+                                <h5>Kotak Pesan (Chat)</h5>
+                                <p>Komunikasi langsung dengan penjual / pembeli.</p>
+                                <a href="#" class="btn btn-info btn-sm text-white">Buka Chat</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
