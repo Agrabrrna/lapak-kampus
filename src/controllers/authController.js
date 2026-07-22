@@ -129,10 +129,15 @@ const postLogout = (req, res) => {
   });
 };
 
+const getForgotPassword = (req, res) => {
+  res.render('auth/forgot-password', { title: 'Lupa Password - KampusLapak' });
+};
+
 module.exports = {
   getRegister,
   postRegister,
   getLogin,
   postLogin,
-  postLogout
+  postLogout,
+  getForgotPassword
 };

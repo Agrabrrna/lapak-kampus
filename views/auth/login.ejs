@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <style>
@@ -35,24 +36,83 @@
             justify-content: center;
             padding: 2rem;
             background-color: var(--color-surface);
+            position: relative;
         }
-        .auth-container { width: 100%; max-width: 400px; }
+        .auth-container { width: 100%; max-width: 420px; z-index: 2; }
         .form-floating > .form-control { border-radius: var(--radius-md); }
         .form-floating > .form-control:focus ~ label::after { background-color: transparent !important; }
+        
+        /* Validasi & Focus */
+        .form-control:focus {
+            box-shadow: 0 0 0 4px var(--color-primary-light);
+            border-color: var(--color-primary);
+        }
+        .form-control.is-invalid {
+            border-color: var(--color-danger);
+            background-image: none; /* Hide default bootstrap icon */
+        }
+        .form-control.is-invalid:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+        }
+        .invalid-feedback { font-size: 0.8rem; font-weight: 500; }
+        
         @media (max-width: 991px) { .split-left { display: none; } }
+        
+        /* Feature List */
+        .feature-list { list-style: none; padding-left: 0; margin-top: 3rem; z-index: 1; }
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .feature-icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
     <div class="split-layout">
         <!-- Left Side: Brand/Illustration -->
         <div class="split-left d-none d-lg-flex">
-            <h1 class="display-4 fw-bold mb-4" style="z-index: 1;">KampusLapak</h1>
-            <p class="fs-5 text-white-50 mb-0" style="z-index: 1; max-width: 80%;">Platform e-commerce eksklusif untuk mahasiswa. Temukan kebutuhan kuliahmu dengan harga terbaik, aman, dan terpercaya.</p>
+            <h1 class="display-4 fw-bold mb-3" style="z-index: 1;">KampusLapak</h1>
+            <p class="fs-5 text-white-50 mb-0" style="z-index: 1; max-width: 85%;">Platform e-commerce eksklusif untuk mahasiswa. Temukan kebutuhan kuliahmu dengan harga terbaik.</p>
+            
+            <ul class="feature-list">
+                <li>
+                    <div class="feature-icon-box"><i class="fas fa-shield-alt fs-5"></i></div>
+                    Aman & Terpercaya
+                </li>
+                <li>
+                    <div class="feature-icon-box"><i class="fas fa-user-graduate fs-5"></i></div>
+                    Eksklusif Mahasiswa
+                </li>
+                <li>
+                    <div class="feature-icon-box"><i class="fas fa-boxes fs-5"></i></div>
+                    Ribuan Produk Kampus
+                </li>
+            </ul>
         </div>
         
         <!-- Right Side: Form -->
         <div class="split-right">
-            <div class="auth-container">
+            <!-- Dark mode toggle top right -->
+            <div class="position-absolute top-0 end-0 p-4">
+                <button class="btn btn-link theme-toggle-btn text-muted p-2" title="Toggle Dark Mode">
+                    <i class="fas fa-moon fs-5"></i>
+                </button>
+            </div>
+
+            <div class="auth-container mt-4 mt-lg-0">
                 <div class="mb-5 text-center text-lg-start">
                     <h2 class="fw-bold text-dark mb-2">Selamat Datang 👋</h2>
                     <p class="text-muted">Silakan masuk ke akun Anda untuk melanjutkan.</p>
@@ -60,29 +120,42 @@
 
                 <% if (error) { %>
                     <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4" role="alert">
-                        <small class="fw-bold"><%= error %></small>
+                        <small class="fw-bold"><i class="fas fa-exclamation-circle me-2"></i> <%= error %></small>
                     </div>
                 <% } %>
                 <% if (typeof success !== 'undefined' && success) { %>
                     <div class="alert alert-success shadow-sm border-0 rounded-3 mb-4" role="alert">
-                        <small class="fw-bold"><%= success %></small>
+                        <small class="fw-bold"><i class="fas fa-check-circle me-2"></i> <%= success %></small>
                     </div>
                 <% } %>
 
-                <form action="/auth/login" method="POST">
+                <form action="/auth/login" method="POST" id="loginForm" novalidate>
                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                     
-                    <div class="form-floating mb-4">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="name@mahasiswa.ac.id" required>
-                        <label for="email" class="text-muted">Email Mahasiswa</label>
+                    <div class="form-floating mb-4 position-relative">
+                        <i class="fas fa-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="z-index: 5;"></i>
+                        <input type="email" class="form-control ps-5" id="email" name="email" placeholder="name@mahasiswa.ac.id" required>
+                        <label for="email" class="text-muted ps-5">Email Mahasiswa</label>
+                        <div class="invalid-feedback ms-1 mt-1"></div>
                     </div>
 
-                    <div class="form-floating mb-5">
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
-                        <label for="password" class="text-muted">Password</label>
+                    <div class="form-floating mb-2 position-relative">
+                        <i class="fas fa-lock position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" style="z-index: 5;"></i>
+                        <input type="password" class="form-control ps-5 pe-5" id="password" name="password" placeholder="Password" required>
+                        <label for="password" class="text-muted ps-5">Password</label>
+                        <button type="button" class="btn btn-link text-muted position-absolute top-50 end-0 translate-middle-y me-2 p-0 text-decoration-none" id="togglePassword" style="z-index: 5;">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback ms-1 mt-1"></div>
+                    </div>
+                    
+                    <div class="text-end mb-4">
+                        <a href="/auth/forgot-password" class="text-primary small text-decoration-none fw-bold">Lupa password?</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-3 fs-6 rounded-pill mb-4 shadow">Masuk ke Akun</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3 fs-6 rounded-pill mb-4 shadow position-relative overflow-hidden">
+                        Masuk ke Akun
+                    </button>
                 </form>
 
                 <div class="text-center mt-3">
@@ -92,9 +165,59 @@
             </div>
         </div>
     </div>
-    <script src="/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            let valid = true;
+            const email = document.getElementById('email');
+            const pass = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Reset
+            email.classList.remove('is-invalid');
+            pass.classList.remove('is-invalid');
+            
+            // Validate Email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!email.value || !emailRegex.test(email.value)) {
+                email.classList.add('is-invalid');
+                email.parentElement.querySelector('.invalid-feedback').innerText = "Mohon masukkan email yang valid.";
+                valid = false;
+            }
+            
+            // Validate Password
+            if(!pass.value) {
+                pass.classList.add('is-invalid');
+                pass.parentElement.querySelector('.invalid-feedback').innerText = "Password wajib diisi.";
+                valid = false;
+            }
+            
+            if(!valid) {
+                e.preventDefault();
+            } else {
+                // Loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Memproses...';
+                // the form will submit normally since we don't e.preventDefault() here
+            }
+        });
 
+        // Toggle Password Visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const pass = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if(pass.type === 'password') {
+                pass.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                pass.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/theme-toggle.js"></script>
 </body>
 </html>
