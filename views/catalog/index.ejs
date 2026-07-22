@@ -54,6 +54,14 @@
                                 <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
                             <% } %>
                         </li>
+                        <li class="nav-item position-relative me-3">
+                            <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
+                                🔔
+                                <% if (locals.unreadCount > 0) { %>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
+                                <% } %>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <span class="text-white me-3 small">Halo, <%= user.name %></span>
                         </li>

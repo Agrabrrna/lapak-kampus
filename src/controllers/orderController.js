@@ -202,6 +202,15 @@ exports.processCheckout = async (req, res) => {
       return order;
     });
 
+    // Notify seller
+    await prisma.notification.create({
+      data: {
+        userId: sellerId,
+        title: 'Pesanan Baru Masuk',
+        message: 'Anda mendapat pesanan baru. Segera periksa di halaman Pesanan Masuk.'
+      }
+    });
+
     // 3. Clear the items from cart
     delete req.session.cart[sellerId];
     
@@ -323,6 +332,16 @@ exports.updateOrderStatus = async (req, res) => {
             data: { stock: { increment: detail.quantity } }
           });
         }
+      }
+    });
+
+    // Notify the other party
+    const targetUserId = (role === 'PEMBELI') ? order.sellerId : order.buyerId;
+    await prisma.notification.create({
+      data: {
+        userId: targetUserId,
+        title: 'Pembaruan Status Pesanan',
+        message: `Status pesanan Anda telah diubah menjadi ${newStatus}.`
       }
     });
 

@@ -152,6 +152,15 @@ const postSendMessage = async (req, res) => {
       }
     });
 
+    // Create Notification
+    await prisma.notification.create({
+      data: {
+        userId: receiverId,
+        title: 'Pesan Baru',
+        message: `Anda mendapat pesan baru dari ${chat.sender.name}.`
+      }
+    });
+
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       // Return JSON if AJAX
       return res.json({ success: true, chat });

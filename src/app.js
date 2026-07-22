@@ -34,11 +34,28 @@ app.use(flash());
 // CSRF Protection
 app.use(csrf());
 
+const prisma = require('./services/db');
+
 // Share variables to all EJS templates
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   res.locals.user = req.session.user || null;
   res.locals.messages = req.flash();
+  
+  res.locals.unreadCount = 0;
+  if (req.session.userId) {
+    try {
+      const count = await prisma.notification.count({
+        where: {
+          userId: req.session.userId,
+          isRead: false
+        }
+      });
+      res.locals.unreadCount = count;
+    } catch (err) {
+      console.error('Error fetching unread notifications:', err);
+    }
+  }
   next();
 });
 
@@ -51,6 +68,7 @@ const wishlistRoutes = require('./routes/wishlistRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 // Use Routes
 app.use('/auth', authRoutes);
@@ -61,6 +79,7 @@ app.use('/', catalogRoutes);
 app.use('/', wishlistRoutes);
 app.use('/', chatRoutes);
 app.use('/', orderRoutes);
+app.use('/', notificationRoutes);
 
 // Home route redirect
 app.get('/', (req, res) => {
