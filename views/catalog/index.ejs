@@ -92,47 +92,50 @@
         <div class="row">
             <!-- Sidebar Filter -->
             <div class="col-lg-3 mb-4">
-                <div class="filter-sidebar shadow-sm">
-                    <h5 class="fw-bold mb-3 text-primary">Filter Pencarian</h5>
+                <div class="filter-sidebar">
+                    <h5 class="fw-bold mb-4 text-dark"><i class="fas fa-filter me-2"></i> Filter</h5>
                     <form action="/products" method="GET">
                         <!-- Search term (hidden or visible) -->
-                        <div class="mb-3">
-                            <label for="q-input" class="form-label fw-bold small text-muted">Cari Nama</label>
-                            <input type="text" class="form-control form-control-sm" id="q-input" name="q" value="<%= filters.q %>" placeholder="Cari buku, laptop...">
+                        <div class="mb-4">
+                            <label for="q-input" class="form-label">Cari Nama</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control border-start-0 ps-0" id="q-input" name="q" value="<%= filters.q %>" placeholder="Cari buku, laptop...">
+                            </div>
                         </div>
 
                         <!-- Category Filter -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted d-block">Kategori</label>
-                            <div class="form-check">
+                        <div class="mb-4">
+                            <label class="form-label d-block">Kategori</label>
+                            <div class="form-check mb-2">
                                 <input class="form-check-input" type="radio" name="category" id="cat-all" value="" <%= !filters.category ? 'checked' : '' %>>
-                                <label class="form-check-label small" for="cat-all">Semua Kategori</label>
+                                <label class="form-check-label" for="cat-all">Semua Kategori</label>
                             </div>
                             <% categories.forEach(cat => { %>
-                                <div class="form-check">
+                                <div class="form-check mb-2">
                                     <input class="form-check-input" type="radio" name="category" id="cat-<%= cat.id %>" value="<%= cat.slug %>" <%= filters.category === cat.slug ? 'checked' : '' %>>
-                                    <label class="form-check-label small" for="cat-<%= cat.id %>"><%= cat.name %></label>
+                                    <label class="form-check-label" for="cat-<%= cat.id %>"><%= cat.name %></label>
                                 </div>
                             <% }) %>
                         </div>
 
                         <!-- Price Range Filter -->
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small text-muted">Rentang Harga (Rp)</label>
-                            <div class="input-group input-group-sm mb-2">
-                                <span class="input-group-text">Min</span>
+                        <div class="mb-4">
+                            <label class="form-label">Rentang Harga (Rp)</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-white text-muted">Rp</span>
                                 <input type="number" class="form-control" name="minPrice" value="<%= filters.minPrice %>" placeholder="Min">
                             </div>
-                            <div class="input-group input-group-sm">
-                                <span class="input-group-text">Max</span>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-muted">Rp</span>
                                 <input type="number" class="form-control" name="maxPrice" value="<%= filters.maxPrice %>" placeholder="Max">
                             </div>
                         </div>
 
                         <!-- Condition Filter -->
-                        <div class="mb-3">
-                            <label for="cond-select" class="form-label fw-bold small text-muted">Kondisi</label>
-                            <select class="form-select form-select-sm" id="cond-select" name="condition">
+                        <div class="mb-4">
+                            <label for="cond-select" class="form-label">Kondisi</label>
+                            <select class="form-select" id="cond-select" name="condition">
                                 <option value="" <%= !filters.condition ? 'selected' : '' %>>Semua Kondisi</option>
                                 <option value="BARU" <%= filters.condition === 'BARU' ? 'selected' : '' %>>Baru</option>
                                 <option value="BEKAS" <%= filters.condition === 'BEKAS' ? 'selected' : '' %>>Bekas</option>
@@ -141,16 +144,16 @@
 
                         <!-- Sort By -->
                         <div class="mb-4">
-                            <label for="sort-select" class="form-label fw-bold small text-muted">Urutkan</label>
-                            <select class="form-select form-select-sm" id="sort-select" name="sortBy">
+                            <label for="sort-select" class="form-label">Urutkan</label>
+                            <select class="form-select" id="sort-select" name="sortBy">
                                 <option value="newest" <%= filters.sortBy === 'newest' ? 'selected' : '' %>>Terbaru</option>
                                 <option value="price_asc" <%= filters.sortBy === 'price_asc' ? 'selected' : '' %>>Harga Terendah</option>
                                 <option value="price_desc" <%= filters.sortBy === 'price_desc' ? 'selected' : '' %>>Harga Tertinggi</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold py-2">Terapkan Filter</button>
-                        <a href="/products" class="btn btn-outline-secondary btn-sm w-100 fw-bold mt-2 py-2">Reset</a>
+                        <button type="submit" class="btn btn-primary w-100 py-2"><i class="fas fa-check me-2"></i> Terapkan</button>
+                        <a href="/products" class="btn btn-outline-primary w-100 mt-3 py-2"><i class="fas fa-undo me-2"></i> Reset</a>
                     </form>
                 </div>
             </div>

@@ -1,154 +1,220 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary-color: #03ac0e; /* Tokopedia Green */
-  --primary-hover: #028c0b;
-  --bg-color: #f3f4f5;
-  --card-bg: #ffffff;
-  --text-dark: #212121;
-  --text-muted: #6d7588;
+  /* SaaS Palette (Tailwind Slate & Indigo inspired) */
+  --color-primary: #4f46e5;       /* Indigo 600 */
+  --color-primary-hover: #4338ca; /* Indigo 700 */
+  --color-primary-light: #e0e7ff; /* Indigo 100 */
+  
+  --color-bg: #f8fafc;            /* Slate 50 - Base app background */
+  --color-surface: #ffffff;       /* White - Cards/Panels */
+  
+  --color-text-main: #0f172a;     /* Slate 900 - Headings */
+  --color-text-muted: #64748b;    /* Slate 500 - Body */
+  --color-text-light: #94a3b8;    /* Slate 400 - Placeholder/Icons */
+  
+  --color-border: #e2e8f0;        /* Slate 200 */
+  
+  --color-success: #10b981;       /* Emerald 500 */
+  --color-warning: #f59e0b;       /* Amber 500 */
+  --color-danger: #ef4444;        /* Red 500 */
+
+  /* Shadows (Soft & Elegant) */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Borders */
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Navbar Modernization */
-.navbar {
-  background: rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  padding: 1rem 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+h1, h2, h3, h4, h5, h6, .text-dark {
+  color: var(--color-text-main) !important;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.navbar-brand {
-  color: var(--primary-color) !important;
-  font-weight: 800;
-  font-size: 1.5rem;
-  letter-spacing: -0.5px;
+p, span, div {
+  font-size: 0.95rem;
 }
 
-.nav-link {
-  color: var(--text-muted) !important;
-  font-weight: 500;
-  transition: color 0.2s;
-}
+/* ================== COMPONENTS ================== */
 
-.nav-link:hover, .nav-link.active {
-  color: var(--primary-color) !important;
-}
-
-/* Cards */
+/* Cards (Replacing generic Bootstrap cards) */
 .card {
-  border: none !important;
-  border-radius: 12px !important;
-  background: var(--card-bg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
 }
 
-.card:hover {
+/* Hover effects for interactive cards (like products) */
+.product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-lg) !important;
+  border-color: var(--color-primary-light) !important;
 }
 
 .card-img-top {
+  height: 220px;
   object-fit: cover;
-  height: 200px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-/* Typography & Badges */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.badge {
-  padding: 0.4em 0.8em;
-  border-radius: 8px;
-  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* Buttons */
 .btn {
-  border-radius: 8px !important;
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  transition: all 0.2s ease;
-  letter-spacing: 0.3px;
+  font-weight: 500;
+  border-radius: var(--radius-md) !important;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-primary {
-  background-color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
-  color: white !important;
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-hover) !important;
+  background-color: var(--color-primary-hover) !important;
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(3, 172, 14, 0.2);
 }
 
 .btn-outline-primary {
-  color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-primary) !important;
+  background: transparent !important;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--primary-color) !important;
-  color: white !important;
+  background-color: var(--color-primary-light) !important;
+  border-color: var(--color-primary) !important;
 }
 
-/* Inputs and Forms */
+.btn-danger {
+  background-color: var(--color-danger) !important;
+  border: none !important;
+}
+
+/* Forms & Inputs */
 .form-control, .form-select {
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  padding: 0.6rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+  background-color: var(--color-surface);
   transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(3, 172, 14, 0.15);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+  outline: none;
 }
 
-/* Custom layout adjustments */
-.container {
-  max-width: 1200px;
-}
-
-/* Product Grid Adjustments */
-.table {
-  vertical-align: middle;
-}
-
-.table th {
+.form-label {
   font-weight: 600;
-  color: var(--text-muted);
-  border-bottom-width: 1px;
+  color: var(--color-text-main);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Navbar (Glassmorphism + Premium feel) */
+.navbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  color: var(--color-primary) !important;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.nav-link {
+  color: var(--color-text-muted) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--color-primary) !important;
+  background-color: var(--color-primary-light);
+}
+
+/* Badges */
+.badge {
+  padding: 0.4em 0.8em;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.bg-primary { background-color: var(--color-primary) !important; }
+.bg-success { background-color: var(--color-success) !important; }
+.bg-warning { background-color: var(--color-warning) !important; color: #fff !important; }
+.bg-danger { background-color: var(--color-danger) !important; }
+
+/* Filter Sidebar */
+.filter-sidebar {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  padding: 1.5rem;
 }
 
 /* Chat Bubbles */
 .chat-bubble {
-  border-radius: 16px;
-  padding: 10px 16px;
-  max-width: 75%;
+  border-radius: 1.25rem;
+  padding: 0.75rem 1.25rem;
+  max-width: 80%;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.95rem;
 }
+
 .chat-bubble-sent {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
   color: white;
   border-bottom-right-radius: 4px;
 }
+
 .chat-bubble-received {
-  background-color: #f1f5f9;
-  color: var(--text-dark);
+  background-color: var(--color-border);
+  color: var(--color-text-main);
   border-bottom-left-radius: 4px;
 }
+
+/* Utility overrides */
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow { box-shadow: var(--shadow-md) !important; }
+.bg-light { background-color: var(--color-bg) !important; }
+.bg-white { background-color: var(--color-surface) !important; }
