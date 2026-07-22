@@ -5,69 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body, html { height: 100%; margin: 0; background-color: var(--color-surface); }
+        .split-layout { min-height: 100vh; display: flex; }
+        .split-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .split-left::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            transform: rotate(30deg);
+        }
+        .split-right {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 2rem;
+            background-color: var(--color-surface);
         }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+        .auth-container { width: 100%; max-width: 400px; }
+        .form-floating > .form-control { border-radius: var(--radius-md); }
+        .form-floating > .form-control:focus ~ label::after { background-color: transparent !important; }
+        @media (max-width: 991px) { .split-left { display: none; } }
     </style>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card p-4">
-                    <div class="text-center mb-4">
-                        <h2 class="text-primary fw-bold">KampusLapak</h2>
-                        <p class="text-muted">Masuk untuk menjelajahi marketplace</p>
+    <div class="split-layout">
+        <!-- Left Side: Brand/Illustration -->
+        <div class="split-left d-none d-lg-flex">
+            <h1 class="display-4 fw-bold mb-4" style="z-index: 1;">KampusLapak</h1>
+            <p class="fs-5 text-white-50 mb-0" style="z-index: 1; max-width: 80%;">Platform e-commerce eksklusif untuk mahasiswa. Temukan kebutuhan kuliahmu dengan harga terbaik, aman, dan terpercaya.</p>
+        </div>
+        
+        <!-- Right Side: Form -->
+        <div class="split-right">
+            <div class="auth-container">
+                <div class="mb-5 text-center text-lg-start">
+                    <h2 class="fw-bold text-dark mb-2">Selamat Datang 👋</h2>
+                    <p class="text-muted">Silakan masuk ke akun Anda untuk melanjutkan.</p>
+                </div>
+
+                <% if (error) { %>
+                    <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4" role="alert">
+                        <small class="fw-bold"><%= error %></small>
+                    </div>
+                <% } %>
+                <% if (typeof success !== 'undefined' && success) { %>
+                    <div class="alert alert-success shadow-sm border-0 rounded-3 mb-4" role="alert">
+                        <small class="fw-bold"><%= success %></small>
+                    </div>
+                <% } %>
+
+                <form action="/auth/login" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    
+                    <div class="form-floating mb-4">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="name@mahasiswa.ac.id" required>
+                        <label for="email" class="text-muted">Email Mahasiswa</label>
                     </div>
 
-                    <% if (error) { %>
-                        <div class="alert alert-danger" role="alert">
-                            <%= error %>
-                        </div>
-                    <% } %>
-
-                    <% if (typeof success !== 'undefined' && success) { %>
-                        <div class="alert alert-success" role="alert">
-                            <%= success %>
-                        </div>
-                    <% } %>
-
-                    <form action="/auth/login" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="name@mahasiswa.ac.id">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="Masukkan password Anda">
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 py-2">Masuk</button>
-                    </form>
-
-                    <div class="text-center mt-3">
-                        <p class="mb-0 text-muted">Belum punya akun? <a href="/auth/register" class="text-primary fw-bold text-decoration-none">Daftar</a></p>
+                    <div class="form-floating mb-5">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <label for="password" class="text-muted">Password</label>
                     </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fs-6 rounded-pill mb-4 shadow">Masuk ke Akun</button>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p class="text-muted small">Belum punya akun? <a href="/auth/register" class="text-primary fw-bold text-decoration-none">Daftar sekarang</a></p>
+                    <a href="/products" class="text-muted small text-decoration-none"><i class="fas fa-arrow-left me-1"></i> Kembali ke Toko</a>
                 </div>
             </div>
         </div>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>

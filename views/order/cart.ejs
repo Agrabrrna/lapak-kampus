@@ -5,79 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <style>
-        .cart-img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-    </style>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .cart-img {
+            width: 96px;
+            height: 96px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .cart-item-row {
+            transition: background-color 0.2s;
+        }
+        .cart-item-row:hover {
+            background-color: #f8fafc; /* super light slate */
+        }
+        .sticky-summary {
+            position: sticky;
+            top: 100px;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
-            <a href="/products" class="btn btn-outline-light btn-sm">Lanjut Belanja</a>
+            <div class="ms-auto">
+                <a href="/products" class="btn btn-outline-primary btn-sm rounded-pill fw-bold"><i class="fas fa-arrow-left me-1"></i> Lanjut Belanja</a>
+            </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <h2 class="fw-bold mb-4">🛒 Keranjang Belanja</h2>
+    <div class="container mt-5 mb-5">
+        <div class="d-flex align-items-center mb-4">
+            <h2 class="fw-bold mb-0 text-dark">Keranjang Belanja</h2>
+            <span class="badge bg-primary ms-3 rounded-pill">SaaS Edition</span>
+        </div>
 
         <% if (messages.success_msg) { %>
-            <div class="alert alert-success"><%= messages.success_msg %></div>
+            <div class="alert alert-success border-0 shadow-sm rounded-3"><%= messages.success_msg %></div>
         <% } %>
         <% if (messages.error_msg) { %>
-            <div class="alert alert-danger"><%= messages.error_msg %></div>
+            <div class="alert alert-danger border-0 shadow-sm rounded-3"><%= messages.error_msg %></div>
         <% } %>
 
         <% if (Object.keys(cart).length === 0) { %>
-            <div class="card p-5 text-center border-0 shadow-sm">
-                <h4 class="text-muted">Keranjang Anda masih kosong.</h4>
-                <a href="/products" class="btn btn-primary mt-3 w-25 mx-auto">Mulai Belanja</a>
+            <div class="card p-5 text-center border-0">
+                <div class="mb-4">
+                    <span style="font-size: 4rem;">🛒</span>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Keranjang Anda Kosong</h4>
+                <p class="text-muted mb-4">Belum ada barang yang ditambahkan. Yuk, cari barang impianmu sekarang!</p>
+                <div>
+                    <a href="/products" class="btn btn-primary rounded-pill px-5 py-2">Mulai Belanja</a>
+                </div>
             </div>
         <% } else { %>
             <% Object.keys(cart).forEach(sellerId => { %>
                 <% const sellerCart = cart[sellerId]; %>
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="mb-0 fw-bold">Penjual: <%= sellerCart.sellerName %></h5>
-                    </div>
-                    <div class="card-body">
-                        <% let sellerTotal = 0; %>
-                        <% sellerCart.items.forEach(item => { %>
-                            <% sellerTotal += item.price * item.quantity; %>
-                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                <img src="<%= item.image || 'https://placehold.co/80' %>" alt="<%= item.name %>" class="cart-img me-3">
-                                <div class="flex-grow-1">
-                                    <h6 class="fw-bold mb-1"><a href="/products/<%= item.productId %>" class="text-decoration-none text-dark"><%= item.name %></a></h6>
-                                    <p class="text-muted mb-0">Rp <%= parseFloat(item.price).toLocaleString('id-ID') %> x <%= item.quantity %></p>
-                                </div>
-                                <div class="text-end me-4">
-                                    <h6 class="fw-bold text-danger mb-0">Rp <%= parseFloat(item.price * item.quantity).toLocaleString('id-ID') %></h6>
-                                </div>
-                                <div>
-                                    <form action="/cart/remove/<%= sellerId %>/<%= item.productId %>" method="POST">
-                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                    </form>
-                                </div>
+                <div class="row mb-5">
+                    <!-- Left Column: Item List -->
+                    <div class="col-lg-8 mb-4 mb-lg-0">
+                        <div class="card border-0">
+                            <div class="card-header bg-white py-3 border-bottom border-light">
+                                <h6 class="mb-0 fw-bold text-muted text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Pesanan dari Penjual</h6>
+                                <h5 class="mb-0 fw-bold mt-1 text-primary"><i class="fas fa-store me-2"></i> <%= sellerCart.sellerName %></h5>
                             </div>
-                        <% }) %>
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <h5 class="fw-bold mb-0">Total: Rp <%= sellerTotal.toLocaleString('id-ID') %></h5>
-                            <a href="/checkout/<%= sellerId %>" class="btn btn-success fw-bold px-4">Checkout dari Penjual Ini</a>
+                            <div class="card-body p-0">
+                                <% let sellerTotal = 0; %>
+                                <% sellerCart.items.forEach((item, index) => { %>
+                                    <% sellerTotal += item.price * item.quantity; %>
+                                    <div class="d-flex align-items-center p-4 cart-item-row <%= index !== sellerCart.items.length - 1 ? 'border-bottom border-light' : '' %>">
+                                        <img src="<%= item.image || 'https://placehold.co/96' %>" alt="<%= item.name %>" class="cart-img me-4 shadow-sm">
+                                        <div class="flex-grow-1">
+                                            <h5 class="fw-bold mb-1">
+                                                <a href="/products/<%= item.productId %>" class="text-decoration-none text-dark"><%= item.name %></a>
+                                            </h5>
+                                            <p class="text-muted mb-2 small"><%= item.quantity %> barang x Rp <%= parseFloat(item.price).toLocaleString('id-ID') %></p>
+                                            <h6 class="fw-bold text-dark mb-0">Rp <%= parseFloat(item.price * item.quantity).toLocaleString('id-ID') %></h6>
+                                        </div>
+                                        <div class="ms-3">
+                                            <form action="/cart/remove/<%= sellerId %>/<%= item.productId %>" method="POST">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill fw-bold px-3">
+                                                    <i class="fas fa-trash-alt me-1"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Sticky Summary -->
+                    <div class="col-lg-4">
+                        <div class="card border-0 sticky-summary bg-primary text-white">
+                            <div class="card-body p-4">
+                                <h5 class="fw-bold mb-4">Ringkasan Belanja</h5>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-white-50">Total Harga</span>
+                                    <span class="fw-bold">Rp <%= sellerTotal.toLocaleString('id-ID') %></span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-4 pb-4 border-bottom border-light" style="border-color: rgba(255,255,255,0.1) !important;">
+                                    <span class="text-white-50">Estimasi Ongkir</span>
+                                    <span class="fw-bold">Dihitung saat checkout</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="fw-bold mb-0">Total Tagihan</h5>
+                                    <h4 class="fw-bold mb-0 text-white">Rp <%= sellerTotal.toLocaleString('id-ID') %></h4>
+                                </div>
+                                <a href="/checkout/<%= sellerId %>" class="btn btn-light w-100 py-3 rounded-pill fw-bold text-primary shadow-sm" style="font-size: 1.1rem;">
+                                    Lanjut ke Checkout <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                                <p class="text-center text-white-50 small mt-3 mb-0">Pembayaran aman dengan enkripsi 256-bit.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             <% }) %>
         <% } %>
     </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 </html>

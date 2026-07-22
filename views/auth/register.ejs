@@ -5,82 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+        body, html { height: 100%; margin: 0; background-color: var(--color-surface); }
+        .split-layout { min-height: 100vh; display: flex; }
+        .split-left {
+            flex: 1;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .split-left::after {
+            content: '';
+            position: absolute;
+            bottom: -50%; right: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 50%);
+            transform: rotate(-30deg);
+        }
+        .split-right {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 3rem 2rem;
+            background-color: var(--color-surface);
+            overflow-y: auto;
         }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
+        .auth-container { width: 100%; max-width: 450px; margin: auto; }
+        .form-floating > .form-control { border-radius: var(--radius-md); }
+        @media (max-width: 991px) { .split-left { display: none; } }
     </style>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card p-4">
-                    <div class="text-center mb-4">
-                        <h2 class="text-primary fw-bold">KampusLapak</h2>
-                        <p class="text-muted">Buat akun untuk memulai transaksi</p>
+    <div class="split-layout">
+        <!-- Left Side: Brand/Illustration -->
+        <div class="split-left d-none d-lg-flex">
+            <h1 class="display-4 fw-bold mb-4" style="z-index: 1;">Bergabung Bersama Kami</h1>
+            <p class="fs-5 text-white-50 mb-0" style="z-index: 1; max-width: 80%;">Buat akun KampusLapak dan nikmati kemudahan jual beli berbagai barang kebutuhan mahasiswa.</p>
+        </div>
+        
+        <!-- Right Side: Form -->
+        <div class="split-right">
+            <div class="auth-container">
+                <div class="mb-4 text-center text-lg-start">
+                    <h2 class="fw-bold text-dark mb-2">Buat Akun Baru ✨</h2>
+                    <p class="text-muted">Isi data diri Anda di bawah ini dengan lengkap.</p>
+                </div>
+
+                <% if (error) { %>
+                    <div class="alert alert-danger shadow-sm border-0 rounded-3 mb-4" role="alert">
+                        <small class="fw-bold"><%= error %></small>
+                    </div>
+                <% } %>
+
+                <form action="/auth/register" method="POST">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Nama Lengkap" required>
+                        <label for="name" class="text-muted">Nama Lengkap</label>
                     </div>
 
-                    <% if (error) { %>
-                        <div class="alert alert-danger" role="alert">
-                            <%= error %>
-                        </div>
-                    <% } %>
-
-                    <form action="/auth/register" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" id="name" name="name" required placeholder="Masukkan nama lengkap">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="name@mahasiswa.ac.id">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="Password minimal 6 karakter">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Daftar Sebagai</label>
-                            <select class="form-select" id="role" name="role">
-                                <option value="PEMBELI" selected>Pembeli (Cari & beli kebutuhan kuliah)</option>
-                                <option value="PENJUAL">Penjual (Mulai menjual barang Anda)</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Nomor Telepon (Opsional)</label>
-                            <input type="text" class="form-control" id="phone" name="phone" placeholder="0812xxxxxx">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Alamat Lengkap (Opsional)</label>
-                            <textarea class="form-control" id="address" name="address" rows="2" placeholder="Alamat kos / rumah"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 py-2">Daftar Akun</button>
-                    </form>
-
-                    <div class="text-center mt-3">
-                        <p class="mb-0 text-muted">Sudah punya akun? <a href="/auth/login" class="text-primary fw-bold text-decoration-none">Masuk</a></p>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="name@mahasiswa.ac.id" required>
+                        <label for="email" class="text-muted">Email Mahasiswa</label>
                     </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <label for="password" class="text-muted">Password (Min. 6 Karakter)</label>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-bold d-block mb-2">Pilih Peran Anda</label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check flex-fill p-0">
+                                <input type="radio" class="btn-check" name="role" id="role-pembeli" value="PEMBELI" checked>
+                                <label class="btn btn-outline-primary w-100 py-2 rounded-pill" for="role-pembeli">Pembeli</label>
+                            </div>
+                            <div class="form-check flex-fill p-0">
+                                <input type="radio" class="btn-check" name="role" id="role-penjual" value="PENJUAL">
+                                <label class="btn btn-outline-primary w-100 py-2 rounded-pill" for="role-penjual">Penjual</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fs-6 rounded-pill mb-4 shadow">Daftar Sekarang</button>
+                </form>
+
+                <div class="text-center mt-2">
+                    <p class="text-muted small">Sudah punya akun? <a href="/auth/login" class="text-primary fw-bold text-decoration-none">Masuk di sini</a></p>
                 </div>
             </div>
         </div>
