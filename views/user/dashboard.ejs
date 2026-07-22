@@ -4,88 +4,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link class="bootstrap-css" rel="stylesheet" href="/css/bootstrap.min.css">
-
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .nav-link.active-nav {
+            color: var(--color-primary) !important;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-primary);
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">KampusLapak</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <!-- Navigation Menus -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 mt-2 mt-lg-0 ms-lg-4 gap-1">
                     <li class="nav-item">
-                        <span class="nav-link text-white me-3">Halo, <%= user.name %> (Role: <%= user.role %>)</span>
+                        <a class="nav-link active-nav px-3" href="/user/dashboard">
+                            <i class="fas fa-home me-1"></i> Beranda
+                        </a>
                     </li>
-                    <div class="d-flex gap-3 align-items-center">
-                    <a href="/notifications" class="text-white text-decoration-none position-relative">
-                        🔔
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="/products">
+                            <i class="fas fa-store me-1"></i> Mulai Belanja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="/cart">
+                            <i class="fas fa-shopping-cart me-1"></i> Keranjang
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="/orders/my-orders">
+                            <i class="fas fa-box-open me-1"></i> Pesanan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="/wishlist">
+                            <i class="fas fa-heart me-1"></i> Wishlist
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="/chat/inbox">
+                            <i class="fas fa-comment-dots me-1"></i> Chat
+                        </a>
+                    </li>
+                    <% if (user.role === 'PENJUAL') { %>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 text-primary fw-bold" href="/seller/products">
+                            <i class="fas fa-store-alt me-1"></i> Toko Saya
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
+
+                <!-- User Actions -->
+                <div class="d-flex align-items-center gap-3 ms-auto mt-3 mt-lg-0 border-start ps-lg-3">
+                    <a href="/notifications" class="text-muted text-decoration-none position-relative" title="Notifikasi">
+                        <i class="fas fa-bell fs-5"></i>
                         <% if (locals.unreadCount > 0) { %>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.55rem; padding: 0.25em 0.5em;">
+                                <%= unreadCount %>
+                            </span>
                         <% } %>
                     </a>
-                    <form action="/auth/logout" method="POST" class="d-inline">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-                    </form>
-                </div>    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card p-4 shadow-sm">
-                    <h2 class="text-primary mb-3">Selamat Datang di KampusLapak!</h2>
-                    <p class="lead">Anda terdaftar sebagai <strong><%= user.role %></strong>. Anda sekarang bisa mengakses fitur-fitur marketplace sesuai kebutuhan Anda.</p>
                     
-                    <div class="row mt-4">
-                        <% if (user.role === 'PENJUAL') { %>
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-primary p-3 h-100">
-                                    <h5>Kelola Toko</h5>
-                                    <p class="text-muted small">Kelola produk dan pesanan masuk dari pembeli.</p>
-                                    <div class="d-flex flex-column gap-2 mt-auto">
-                                        <a href="/seller/products/add" class="btn btn-primary btn-sm text-start">➕ Tambah Produk Baru</a>
-                                        <a href="/seller/products" class="btn btn-outline-primary btn-sm text-start">📦 Kelola Produk Saya</a>
-                                        <a href="/orders/incoming" class="btn btn-outline-primary btn-sm text-start">📋 Pesanan Masuk</a>
-                                    </div>
-                                </div>
+                    <div class="dropdown">
+                        <a class="text-decoration-none text-dark fw-bold dropdown-toggle d-flex align-items-center gap-2" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                <%= user.name.charAt(0).toUpperCase() %>
                             </div>
-                        <% } else { %>
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-primary p-3 h-100">
-                                    <h5>Menu Pembeli</h5>
-                                    <p class="text-muted small">Cari produk, lihat keranjang, dan pantau pesanan Anda.</p>
-                                    <div class="d-flex flex-column gap-2 mt-auto">
-                                        <a href="/products" class="btn btn-primary btn-sm text-start">🛍️ Mulai Belanja</a>
-                                        <a href="/cart" class="btn btn-outline-primary btn-sm text-start">🛒 Keranjang Belanja</a>
-                                        <a href="/orders/my-orders" class="btn btn-outline-primary btn-sm text-start">📦 Pesanan Saya</a>
-                                        <a href="/wishlist" class="btn btn-outline-primary btn-sm text-start">❤️ Wishlist Saya</a>
-                                    </div>
-                                </div>
-                            </div>
-                        <% } %>
-                         <div class="col-md-6 mb-3">
-                            <div class="card border-info p-3">
-                                <h5>Kotak Pesan (Chat)</h5>
-                                <p>Komunikasi langsung dengan penjual / pembeli.</p>
-                                <a href="/chat/inbox" class="btn btn-info btn-sm text-white">Buka Chat</a>
-                            </div>
-                        </div>
+                            <span class="d-none d-lg-block"><%= user.name %></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="userDropdown">
+                            <li><span class="dropdown-item-text text-muted small">Role: <%= user.role %></span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="/auth/logout" method="POST" class="m-0 p-0">
+                                    <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>">
+                                    <button type="submit" class="dropdown-item text-danger fw-bold">
+                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
+    </nav>
+
+    <!-- Main Content: Product Grid -->
+    <div class="container mt-4 mb-5">
+        
+        <!-- Search & Filter Bar -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+                <form action="/user/dashboard" method="GET" class="row g-2 align-items-center">
+                    <div class="col-md-7 col-lg-8">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" name="q" value="<%= filters.q %>" placeholder="Cari buku, laptop, atau kebutuhan kuliah lainnya...">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-lg-3">
+                        <select class="form-select" name="category">
+                            <option value="">Semua Kategori</option>
+                            <% categories.forEach(cat => { %>
+                                <option value="<%= cat.slug %>" <%= filters.category === cat.slug ? 'selected' : '' %>><%= cat.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-lg-1">
+                        <button type="submit" class="btn btn-primary w-100">Cari</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Section Title -->
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <h4 class="fw-bold text-dark mb-1">Rekomendasi Terbaru</h4>
+                <p class="text-muted small mb-0">Temukan barang incaranmu hari ini.</p>
+            </div>
+            <a href="/products" class="text-primary text-decoration-none fw-bold small">Lihat Semua <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+
+        <% if (products.length === 0) { %>
+            <!-- Empty State -->
+            <div class="card border-0 shadow-sm text-center py-5 mt-4">
+                <div class="mb-3"><i class="fas fa-box-open text-muted" style="font-size: 3rem;"></i></div>
+                <h5 class="fw-bold text-dark">Belum ada produk</h5>
+                <p class="text-muted mb-0">Maaf, belum ada produk yang sesuai dengan pencarian Anda saat ini.</p>
+                <div class="mt-3">
+                    <a href="/user/dashboard" class="btn btn-outline-primary btn-sm rounded-pill px-4">Reset Pencarian</a>
+                </div>
+            </div>
+        <% } else { %>
+            <!-- Grid -->
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                <% products.forEach(product => { %>
+                    <% 
+                        const primaryImg = product.images && product.images.length > 0 
+                                            ? product.images[0] 
+                                            : null;
+                        const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/400x300?text=No+Image';
+                    %>
+                    <div class="col">
+                        <div class="card h-100 product-card border-0 shadow-sm">
+                            <a href="/products/<%= product.id %>" class="text-decoration-none text-dark">
+                                <img src="<%= imgPath %>" class="card-img-top" alt="<%= product.name %>" style="height: 180px; object-fit: cover;">
+                                <div class="card-body d-flex flex-column p-3">
+                                    <div class="mb-2">
+                                        <span class="badge bg-primary fw-normal" style="font-size: 0.65rem;"><%= product.category.name %></span>
+                                        <% if (product.condition === 'BARU') { %>
+                                            <span class="badge bg-success fw-normal" style="font-size: 0.65rem;">Baru</span>
+                                        <% } else { %>
+                                            <span class="badge bg-warning fw-normal" style="font-size: 0.65rem;">Bekas</span>
+                                        <% } %>
+                                    </div>
+                                    <h6 class="card-title fw-bold text-truncate mb-1" style="font-size: 0.95rem;"><%= product.name %></h6>
+                                    <h5 class="text-primary fw-bold mb-3 mt-auto">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></h5>
+                                    
+                                    <div class="d-flex align-items-center justify-content-between mt-auto">
+                                        <span class="text-muted small"><i class="fas fa-box me-1"></i> Stok: <%= product.stock %></span>
+                                        <!-- Optional Add to Cart button could go here -->
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
     </div>
+
     <script src="/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
