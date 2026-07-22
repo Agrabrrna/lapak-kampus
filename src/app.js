@@ -41,11 +41,13 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const productRoutes = require('./routes/productRoutes');
+const catalogRoutes = require('./routes/catalogRoutes');
 
 // Use Routes
 app.use('/auth', authRoutes);
 app.use('/', dashboardRoutes);
 app.use('/', productRoutes);
+app.use('/', catalogRoutes);
 
 // Home route redirect
 app.get('/', (req, res) => {
@@ -55,7 +57,7 @@ app.get('/', (req, res) => {
     }
     return res.redirect('/user/dashboard');
   }
-  res.redirect('/auth/login');
+  res.redirect('/products');
 });
 
 // Error handling for CSRF

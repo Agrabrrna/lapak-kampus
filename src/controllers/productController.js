@@ -12,7 +12,7 @@ const ensureCategoriesExist = async () => {
         { name: 'Buku', slug: 'buku' },
         { name: 'Laptop', slug: 'laptop' },
         { name: 'Alat Praktikum', slug: 'alat-praktikum' },
-        { name: 'Kebutuhan Kampus Lainnya', slug: 'kebutuhan-kampus-lainnya' }
+        { name: 'Kebutuhan Lainnya', slug: 'kebutuhan-lainnya' }
       ]
     });
   }

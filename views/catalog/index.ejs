@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 12px;
+            border: none;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        }
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            width: 100%;
+        }
+        .filter-sidebar {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/products">Katalog</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <% if (user) { %>
+                        <li class="nav-item">
+                            <% if (user.role === 'ADMIN') { %>
+                                <a class="btn btn-outline-light btn-sm me-2" href="/admin/dashboard">Dashboard</a>
+                            <% } else if (user.role === 'PENJUAL') { %>
+                                <a class="btn btn-outline-light btn-sm me-2" href="/seller/products">Panel Penjual</a>
+                            <% } else { %>
+                                <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
+                            <% } %>
+                        </li>
+                        <li class="nav-item">
+                            <span class="text-white me-3 small">Halo, <%= user.name %></span>
+                        </li>
+                        <li class="nav-item">
+                            <form action="/auth/logout" method="POST" class="m-0">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                            </form>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm me-2" href="/auth/login">Masuk</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-light btn-sm text-primary fw-bold" href="/auth/register">Daftar</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <!-- Sidebar Filter -->
+            <div class="col-lg-3 mb-4">
+                <div class="filter-sidebar shadow-sm">
+                    <h5 class="fw-bold mb-3 text-primary">Filter Pencarian</h5>
+                    <form action="/products" method="GET">
+                        <!-- Search term (hidden or visible) -->
+                        <div class="mb-3">
+                            <label for="q-input" class="form-label fw-bold small text-muted">Cari Nama</label>
+                            <input type="text" class="form-control form-control-sm" id="q-input" name="q" value="<%= filters.q %>" placeholder="Cari buku, laptop...">
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted d-block">Kategori</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="category" id="cat-all" value="" <%= !filters.category ? 'checked' : '' %>>
+                                <label class="form-check-label small" for="cat-all">Semua Kategori</label>
+                            </div>
+                            <% categories.forEach(cat => { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="category" id="cat-<%= cat.id %>" value="<%= cat.slug %>" <%= filters.category === cat.slug ? 'checked' : '' %>>
+                                    <label class="form-check-label small" for="cat-<%= cat.id %>"><%= cat.name %></label>
+                                </div>
+                            <% }) %>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Rentang Harga (Rp)</label>
+                            <div class="input-group input-group-sm mb-2">
+                                <span class="input-group-text">Min</span>
+                                <input type="number" class="form-control" name="minPrice" value="<%= filters.minPrice %>" placeholder="Min">
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Max</span>
+                                <input type="number" class="form-control" name="maxPrice" value="<%= filters.maxPrice %>" placeholder="Max">
+                            </div>
+                        </div>
+
+                        <!-- Condition Filter -->
+                        <div class="mb-3">
+                            <label for="cond-select" class="form-label fw-bold small text-muted">Kondisi</label>
+                            <select class="form-select form-select-sm" id="cond-select" name="condition">
+                                <option value="" <%= !filters.condition ? 'selected' : '' %>>Semua Kondisi</option>
+                                <option value="BARU" <%= filters.condition === 'BARU' ? 'selected' : '' %>>Baru</option>
+                                <option value="BEKAS" <%= filters.condition === 'BEKAS' ? 'selected' : '' %>>Bekas</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort By -->
+                        <div class="mb-4">
+                            <label for="sort-select" class="form-label fw-bold small text-muted">Urutkan</label>
+                            <select class="form-select form-select-sm" id="sort-select" name="sortBy">
+                                <option value="newest" <%= filters.sortBy === 'newest' ? 'selected' : '' %>>Terbaru</option>
+                                <option value="price_asc" <%= filters.sortBy === 'price_asc' ? 'selected' : '' %>>Harga Terendah</option>
+                                <option value="price_desc" <%= filters.sortBy === 'price_desc' ? 'selected' : '' %>>Harga Tertinggi</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold py-2">Terapkan Filter</button>
+                        <a href="/products" class="btn btn-outline-secondary btn-sm w-100 fw-bold mt-2 py-2">Reset</a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Products List Area -->
+            <div class="col-lg-9">
+                <!-- Search bar & Results Count -->
+                <div class="card p-3 mb-4 border-0 shadow-sm">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Ditemukan <strong><%= totalProducts %></strong> produk</span>
+                            <% if (filters.q) { %>
+                                <span class="text-muted"> untuk pencarian "<strong><%= filters.q %></strong>"</span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (products.length === 0) { %>
+                    <div class="card text-center p-5 border-0 shadow-sm">
+                        <h4 class="text-muted fw-bold">Produk Tidak Ditemukan</h4>
+                        <p class="text-muted">Coba ganti filter atau kata kunci pencarian Anda.</p>
+                        <div>
+                            <a href="/products" class="btn btn-primary">Lihat Semua Produk</a>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <!-- Products Grid -->
+                    <div class="row">
+                        <% products.forEach(product => { %>
+                            <% 
+                                const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
+                                const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/300x200?text=No+Image';
+                            %>
+                            <div class="col-md-6 col-xl-4 mb-4">
+                                <div class="card h-100 shadow-sm product-card">
+                                    <img src="<%= imgPath %>" class="card-img-top product-img" alt="<%= product.name %>">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="badge bg-primary"><%= product.category.name %></span>
+                                            <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %>"><%= product.condition %></span>
+                                        </div>
+                                        <h5 class="card-title fw-bold text-dark mb-1 text-truncate"><%= product.name %></h5>
+                                        <p class="text-danger fw-bold fs-5 mb-2">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></p>
+                                        <p class="card-text text-muted small text-truncate-3 flex-grow-1"><%= product.description %></p>
+                                        <div class="mt-3">
+                                            <p class="small text-muted mb-2">Stok: <strong><%= product.stock %></strong></p>
+                                            <% if (user) { %>
+                                                <a href="#" class="btn btn-outline-primary btn-sm w-100 fw-bold py-2">Hubungi Penjual</a>
+                                            <% } else { %>
+                                                <a href="/auth/login" class="btn btn-outline-primary btn-sm w-100 fw-bold py-2">Login untuk Hubungi</a>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+
+                    <!-- Pagination -->
+                    <% if (totalPages > 1) { %>
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <% 
+                                    // Helper to build URL queries for page links
+                                    const buildPageUrl = (pageNumber) => {
+                                        const params = new URLSearchParams(filters);
+                                        params.set('page', pageNumber);
+                                        return '/products?' + params.toString();
+                                    }
+                                %>
+                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="<%= buildPageUrl(currentPage - 1) %>">Sebelumnya</a>
+                                </li>
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="<%= buildPageUrl(i) %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="<%= buildPageUrl(currentPage + 1) %>">Selanjutnya</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
