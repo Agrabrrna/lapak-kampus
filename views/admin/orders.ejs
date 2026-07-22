@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin/dashboard">Admin Panel</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/users">Pengguna</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/categories">Kategori</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/orders">Transaksi</a></li>
+                </ul>
+                <div class="d-flex gap-2">
+                    <a href="/products" class="btn btn-outline-light btn-sm">Ke Toko</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="fw-bold mb-4">Pantau Seluruh Transaksi</h2>
+        
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Pesanan</th>
+                                <th>Tanggal</th>
+                                <th>Pembeli</th>
+                                <th>Penjual</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Detail Produk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (orders.length === 0) { %>
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">Belum ada transaksi di platform.</td>
+                                </tr>
+                            <% } else { %>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td><small class="text-muted"><%= order.id.split('-')[0] %>...</small></td>
+                                        <td><%= new Date(order.createdAt).toLocaleDateString('id-ID') %></td>
+                                        <td>
+                                            <%= order.buyer.name %><br>
+                                            <small class="text-muted"><%= order.buyer.email %></small>
+                                        </td>
+                                        <td><%= order.seller.name %></td>
+                                        <td class="fw-bold">Rp <%= parseFloat(order.totalPrice).toLocaleString('id-ID') %></td>
+                                        <td>
+                                            <% if (order.status === 'PENDING') { %>
+                                                <span class="badge bg-warning text-dark">PENDING</span>
+                                            <% } else if (order.status === 'DIPROSES') { %>
+                                                <span class="badge bg-info text-dark">DIPROSES</span>
+                                            <% } else if (order.status === 'SELESAI') { %>
+                                                <span class="badge bg-success">SELESAI</span>
+                                            <% } else if (order.status === 'DIBATALKAN') { %>
+                                                <span class="badge bg-danger">DIBATALKAN</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <ul class="list-unstyled mb-0 small">
+                                                <% order.orderDetails.forEach(detail => { %>
+                                                    <li>- <%= detail.product.name %> (<%= detail.quantity %>x)</li>
+                                                <% }) %>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

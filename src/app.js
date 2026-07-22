@@ -50,9 +50,11 @@ const catalogRoutes = require('./routes/catalogRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Use Routes
 app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
 app.use('/', dashboardRoutes);
 app.use('/', productRoutes);
 app.use('/', catalogRoutes);

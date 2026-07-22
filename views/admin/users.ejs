@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <!-- Navbar (same as dashboard) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin/dashboard">Admin Panel</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/users">Pengguna</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/categories">Kategori</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/orders">Transaksi</a></li>
+                </ul>
+                <div class="d-flex gap-2">
+                    <a href="/products" class="btn btn-outline-light btn-sm">Ke Toko</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="fw-bold mb-4">Daftar Pengguna</h2>
+        
+        <% if (messages && messages.error_msg) { %>
+            <div class="alert alert-danger"><%= messages.error_msg %></div>
+        <% } %>
+        <% if (messages && messages.success_msg) { %>
+            <div class="alert alert-success"><%= messages.success_msg %></div>
+        <% } %>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nama</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(u => { %>
+                                <tr>
+                                    <td><%= u.name %></td>
+                                    <td><%= u.email %></td>
+                                    <td>
+                                        <form action="/admin/users/<%= u.id %>/role" method="POST" class="d-flex gap-2">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <select name="role" class="form-select form-select-sm" <%= u.id === user.id ? 'disabled' : '' %>>
+                                                <option value="PEMBELI" <%= u.role === 'PEMBELI' ? 'selected' : '' %>>PEMBELI</option>
+                                                <option value="PENJUAL" <%= u.role === 'PENJUAL' ? 'selected' : '' %>>PENJUAL</option>
+                                                <option value="ADMIN" <%= u.role === 'ADMIN' ? 'selected' : '' %>>ADMIN</option>
+                                            </select>
+                                            <% if (u.id !== user.id) { %>
+                                                <button type="submit" class="btn btn-sm btn-outline-primary">Ubah</button>
+                                            <% } %>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <% if (u.isActive) { %>
+                                            <span class="badge bg-success">Aktif</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Nonaktif</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (u.id !== user.id) { %>
+                                            <form action="/admin/users/<%= u.id %>/toggle-active" method="POST" onsubmit="return confirm('Yakin ingin merubah status akun ini?');">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <% if (u.isActive) { %>
+                                                    <button type="submit" class="btn btn-sm btn-danger">Nonaktifkan</button>
+                                                <% } else { %>
+                                                    <button type="submit" class="btn btn-sm btn-success">Aktifkan</button>
+                                                <% } %>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

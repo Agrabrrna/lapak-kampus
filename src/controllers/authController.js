@@ -76,6 +76,14 @@ const postLogin = async (req, res) => {
       });
     }
 
+    if (!user.isActive) {
+      return res.render('auth/login', {
+        title: 'Masuk - KampusLapak',
+        error: 'Akun Anda telah dinonaktifkan oleh Admin. Silakan hubungi dukungan.',
+        success: null
+      });
+    }
+
     // Compare passwords
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
