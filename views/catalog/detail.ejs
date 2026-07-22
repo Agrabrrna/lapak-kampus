@@ -60,7 +60,15 @@
                 <div class="card p-4 border-0 shadow-sm mb-4">
                     <span class="badge bg-primary align-self-start mb-2"><%= product.category.name %></span>
                     <h1 class="fw-bold text-dark h2 mb-1"><%= product.name %></h1>
-                    <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %> align-self-start mb-3"><%= product.condition %></span>
+                    <div class="mb-3 d-flex align-items-center gap-2">
+                        <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %>"><%= product.condition %></span>
+                        <% if (product.reviews && product.reviews.length > 0) { %>
+                            <span class="text-warning fw-bold">⭐ <%= averageRating %></span>
+                            <span class="text-muted small">(<%= product.reviews.length %> ulasan)</span>
+                        <% } else { %>
+                            <span class="text-muted small">Belum ada ulasan</span>
+                        <% } %>
+                    </div>
                     
                     <h3 class="text-danger fw-bold mb-3">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></h3>
                     <p class="text-muted">Stok: <strong><%= product.stock %></strong> | Kondisi: <strong><%= product.condition %></strong></p>
@@ -133,6 +141,67 @@
                             <a href="/auth/login" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">Login untuk Hubungi Penjual</a>
                         <% } %>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ulasan Produk Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h4 class="fw-bold mb-4">Ulasan Produk</h4>
+                    
+                    <% if (messages && messages.success_msg) { %>
+                        <div class="alert alert-success"><%= messages.success_msg %></div>
+                    <% } %>
+                    <% if (messages && messages.error_msg) { %>
+                        <div class="alert alert-danger"><%= messages.error_msg %></div>
+                    <% } %>
+
+                    <!-- Form Ulasan -->
+                    <% if (user && user.role === 'PEMBELI' && hasCompletedOrder && !hasReviewed) { %>
+                        <div class="bg-light p-3 rounded mb-4">
+                            <h6 class="fw-bold">Beri Ulasan Anda</h6>
+                            <form action="/products/<%= product.id %>/review" method="POST">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <div class="mb-3">
+                                    <label class="form-label">Rating (1-5)</label>
+                                    <select name="rating" class="form-select" required>
+                                        <option value="5">⭐⭐⭐⭐⭐ Sangat Bagus</option>
+                                        <option value="4">⭐⭐⭐⭐ Bagus</option>
+                                        <option value="3">⭐⭐⭐ Lumayan</option>
+                                        <option value="2">⭐⭐ Kurang</option>
+                                        <option value="1">⭐ Buruk</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Komentar (Opsional)</label>
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Tulis komentar tentang produk ini..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary fw-bold">Kirim Ulasan</button>
+                            </form>
+                        </div>
+                    <% } %>
+
+                    <!-- Daftar Ulasan -->
+                    <% if (product.reviews && product.reviews.length > 0) { %>
+                        <div class="list-group list-group-flush">
+                            <% product.reviews.forEach(review => { %>
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="fw-bold text-dark"><%= review.user.name %></span>
+                                        <span class="text-muted small"><%= new Date(review.createdAt).toLocaleDateString('id-ID') %></span>
+                                    </div>
+                                    <div class="text-warning mb-2">
+                                        <% for(let i=0; i<review.rating; i++) { %>⭐<% } %>
+                                    </div>
+                                    <p class="mb-0 text-secondary"><%= review.comment || 'Tidak ada komentar.' %></p>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted">Produk ini belum memiliki ulasan.</p>
+                    <% } %>
                 </div>
             </div>
         </div>

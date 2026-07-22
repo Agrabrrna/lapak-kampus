@@ -106,6 +106,14 @@ const getProductDetail = async (req, res) => {
             email: true,
             phone: true
           }
+        },
+        reviews: {
+          include: {
+            user: {
+              select: { name: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
         }
       }
     });
@@ -116,6 +124,9 @@ const getProductDetail = async (req, res) => {
 
     // Check if product is in logged-in user's wishlist
     let inWishlist = false;
+    let hasCompletedOrder = false;
+    let hasReviewed = false;
+
     if (req.session.userId) {
       const wishlistEntry = await prisma.wishlist.findFirst({
         where: {
@@ -126,12 +137,47 @@ const getProductDetail = async (req, res) => {
       if (wishlistEntry) {
         inWishlist = true;
       }
+
+      // Check if user has completed order for this product
+      if (req.session.user.role === 'PEMBELI') {
+        const completedOrder = await prisma.order.findFirst({
+          where: {
+            buyerId: req.session.userId,
+            status: 'SELESAI',
+            orderDetails: {
+              some: {
+                productId: id
+              }
+            }
+          }
+        });
+
+        if (completedOrder) {
+          hasCompletedOrder = true;
+        }
+
+        // Check if user has already reviewed
+        const existingReview = product.reviews.find(r => r.userId === req.session.userId);
+        if (existingReview) {
+          hasReviewed = true;
+        }
+      }
+    }
+
+    // Calculate average rating
+    let averageRating = 0;
+    if (product.reviews.length > 0) {
+      const sum = product.reviews.reduce((acc, curr) => acc + curr.rating, 0);
+      averageRating = (sum / product.reviews.length).toFixed(1);
     }
 
     res.render('catalog/detail', {
       title: product.name + ' - KampusLapak',
       product,
-      inWishlist
+      inWishlist,
+      averageRating,
+      hasCompletedOrder,
+      hasReviewed
     });
 
   } catch (err) {
@@ -140,7 +186,70 @@ const getProductDetail = async (req, res) => {
   }
 };
 
+const postReview = async (req, res) => {
+  const { id } = req.params;
+  const { rating, comment } = req.body;
+
+  try {
+    const ratingInt = parseInt(rating);
+    if (isNaN(ratingInt) || ratingInt < 1 || ratingInt > 5) {
+      req.flash('error_msg', 'Rating harus antara 1 sampai 5.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    // Verify user has completed order
+    const completedOrder = await prisma.order.findFirst({
+      where: {
+        buyerId: req.session.userId,
+        status: 'SELESAI',
+        orderDetails: {
+          some: {
+            productId: id
+          }
+        }
+      }
+    });
+
+    if (!completedOrder) {
+      req.flash('error_msg', 'Anda tidak bisa mereview produk ini sebelum pesanan selesai.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    // Check if already reviewed
+    const existingReview = await prisma.review.findFirst({
+      where: {
+        productId: id,
+        userId: req.session.userId
+      }
+    });
+
+    if (existingReview) {
+      req.flash('error_msg', 'Anda sudah mereview produk ini.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    // Create review
+    await prisma.review.create({
+      data: {
+        productId: id,
+        userId: req.session.userId,
+        rating: ratingInt,
+        comment: comment || null
+      }
+    });
+
+    req.flash('success_msg', 'Terima kasih atas ulasan Anda!');
+    res.redirect(req.get('Referrer') || '/');
+
+  } catch (err) {
+    console.error(err);
+    req.flash('error_msg', 'Terjadi kesalahan saat mengirim ulasan.');
+    res.redirect(req.get('Referrer') || '/');
+  }
+};
+
 module.exports = {
   getCatalog,
-  getProductDetail
+  getProductDetail,
+  postReview
 };

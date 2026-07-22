@@ -281,7 +281,7 @@ exports.updateOrderStatus = async (req, res) => {
 
     if (!order) {
       req.flash('error_msg', 'Pesanan tidak ditemukan.');
-      return res.redirect('back');
+      return res.redirect(req.get('Referrer') || '/');
     }
 
     // Validate authorization and valid transitions
@@ -305,7 +305,7 @@ exports.updateOrderStatus = async (req, res) => {
 
     if (!allowed) {
       req.flash('error_msg', 'Anda tidak memiliki akses untuk mengubah status ini.');
-      return res.redirect('back');
+      return res.redirect(req.get('Referrer') || '/');
     }
 
     // Execute the update
@@ -327,11 +327,11 @@ exports.updateOrderStatus = async (req, res) => {
     });
 
     req.flash('success_msg', `Status pesanan berhasil diubah menjadi ${newStatus}.`);
-    res.redirect('back');
+    res.redirect(req.get('Referrer') || '/');
 
   } catch (error) {
     console.error('Error updating order status:', error);
     req.flash('error_msg', 'Terjadi kesalahan saat mengubah status.');
-    res.redirect('back');
+    res.redirect(req.get('Referrer') || '/');
   }
 };
