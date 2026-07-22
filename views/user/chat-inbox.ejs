@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .thread-item {
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .thread-item:hover {
+            background-color: #f1f3f9;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white me-3 small">Halo, <%= user.name %></span>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/auth/logout" method="POST" class="m-0">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container mt-5 mb-5">
+        <h2 class="text-primary fw-bold mb-4">💬 Kotak Masuk Chat</h2>
+
+        <% if (threads.length === 0) { %>
+            <div class="card p-5 text-center shadow-sm border-0">
+                <h4 class="text-muted fw-bold">Belum ada percakapan</h4>
+                <p class="text-muted">Chat dengan penjual atau pembeli akan muncul di sini.</p>
+                <div>
+                    <a href="/products" class="btn btn-primary">Cari Barang dan Hubungi Penjual</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="card shadow-sm border-0">
+                        <div class="list-group list-group-flush">
+                            <% threads.forEach(thread => { %>
+                                <a href="/chat/room/<%= thread.otherUser.id %>/<%= thread.product ? thread.product.id : 'no-product' %>" class="list-group-item list-group-item-action thread-item p-4 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-light p-3 rounded-circle me-3">
+                                            <span class="fs-4">👤</span>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1 text-dark"><%= thread.otherUser.name %></h6>
+                                            <% if (thread.product) { %>
+                                                <p class="text-primary mb-1 small">
+                                                    📦 Produk: <strong><%= thread.product.name %></strong> (Rp <%= parseFloat(thread.product.price).toLocaleString('id-ID') %>)
+                                                </p>
+                                            <% } %>
+                                            <p class="text-muted mb-0 small text-truncate" style="max-width: 400px;"><%= thread.lastMessage %></p>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <small class="text-muted"><%= new Date(thread.lastMessageTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %></small>
+                                        <div class="text-muted small"><%= new Date(thread.lastMessageTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) %></div>
+                                    </div>
+                                </a>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

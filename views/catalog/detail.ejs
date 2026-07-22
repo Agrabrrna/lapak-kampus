@@ -111,9 +111,12 @@
                         <p class="small text-muted mb-2">Telepon/WA: <strong><%= product.user.phone || 'Tidak dicantumkan' %></strong></p>
                         
                         <% if (user) { %>
-                            <a href="https://wa.me/<%= product.user.phone ? product.user.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-success btn-sm w-100 mt-2 fw-bold">Hubungi via WhatsApp</a>
+                            <% if (user.id !== product.userId) { %>
+                                <a href="/chat/initiate/<%= product.id %>" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">💬 Hubungi via Chat Internal</a>
+                            <% } %>
+                            <a href="https://wa.me/<%= product.user.phone ? product.user.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-success btn-sm w-100 mt-2 fw-bold">🟢 Hubungi via WhatsApp</a>
                         <% } else { %>
-                            <a href="/auth/login" class="btn btn-success btn-sm w-100 mt-2 fw-bold">Login untuk Hubungi Penjual</a>
+                            <a href="/auth/login" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">Login untuk Hubungi Penjual</a>
                         <% } %>
                     </div>
                 </div>
