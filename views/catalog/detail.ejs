@@ -5,25 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .detail-img {
-            max-height: 450px;
-            object-fit: contain;
+            max-height: 500px;
+            object-fit: cover;
             width: 100%;
-            background-color: #f8f9fa;
-            border-radius: 12px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .img-gallery {
+            border: 1px solid var(--color-border);
+            padding: 0.5rem;
+            border-radius: 20px;
+            background: var(--color-surface);
         }
         .thumbnail-img {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
             border: 2px solid transparent;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+        .thumbnail-img:hover {
+            opacity: 1;
+            transform: translateY(-2px);
         }
         .thumbnail-img.active {
-            border-color: #0d6efd;
+            border-color: var(--color-primary);
+            opacity: 1;
         }
+        .star-icon { color: #f59e0b; }
     </style>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -34,114 +49,150 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
-            <a href="/products" class="btn btn-outline-light btn-sm">Kembali ke Katalog</a>
+            
+            <div class="ms-auto d-flex align-items-center">
+                <button class="btn btn-link nav-link theme-toggle-btn p-2 me-3" title="Toggle Dark Mode">
+                    <i class="fas fa-moon fs-5 text-muted"></i>
+                </button>
+                <a href="/products" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Kembali ke Katalog
+                </a>
+            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <div class="container mt-5 mb-5">
-        <div class="row">
-            <!-- Product Images -->
-            <div class="col-md-6 mb-4">
-                <% 
-                    const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
-                    const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/600x400?text=No+Image';
-                %>
-                <img src="<%= imgPath %>" id="mainImage" class="detail-img img-fluid shadow-sm mb-3" alt="<%= product.name %>">
-                
-                <% if (product.images && product.images.length > 1) { %>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <% product.images.forEach((img, idx) => { %>
-                            <img src="<%= img.imagePath %>" class="thumbnail-img <%= img.isPrimary || (idx === 0 && !product.images.some(i => i.isPrimary)) ? 'active' : '' %>" onclick="changeImage(this, '<%= img.imagePath %>')" alt="Thumbnail">
-                        <% }) %>
-                    </div>
-                <% } %>
-            </div>
-
-            <!-- Product Details & Seller Info -->
-            <div class="col-md-6">
-                <div class="card p-4 border-0 shadow-sm mb-4">
-                    <span class="badge bg-primary align-self-start mb-2"><%= product.category.name %></span>
-                    <h1 class="fw-bold text-dark h2 mb-1"><%= product.name %></h1>
-                    <div class="mb-3 d-flex align-items-center gap-2">
-                        <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %>"><%= product.condition %></span>
-                        <% if (product.reviews && product.reviews.length > 0) { %>
-                            <span class="text-warning fw-bold">⭐ <%= averageRating %></span>
-                            <span class="text-muted small">(<%= product.reviews.length %> ulasan)</span>
-                        <% } else { %>
-                            <span class="text-muted small">Belum ada ulasan</span>
-                        <% } %>
-                    </div>
+        <div class="row gx-5">
+            <!-- Left Column: Product Images -->
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="img-gallery shadow-sm">
+                    <% 
+                        const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
+                        const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/800x600?text=No+Image';
+                    %>
+                    <img src="<%= imgPath %>" id="mainImage" class="detail-img shadow-sm mb-3" alt="<%= product.name %>">
                     
-                    <h3 class="text-danger fw-bold mb-3">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></h3>
-                    <p class="text-muted">Stok: <strong><%= product.stock %></strong> | Kondisi: <strong><%= product.condition %></strong></p>
-                    
-                    <hr>
-                    
-                    <h5 class="fw-bold text-dark">Deskripsi Produk</h5>
-                    <p class="text-secondary" style="white-space: pre-line;"><%= product.description %></p>
-                    
-                    <hr>
-
-                    <!-- Cart and Wishlist Actions -->
-                    <% if (user) { %>
-                        <% if (user.role === 'PEMBELI') { %>
-                            
-                            <!-- Add to Cart Form -->
-                            <form action="/cart/add/<%= product.id %>" method="POST" class="mb-3">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <div class="d-flex gap-2">
-                                    <input type="number" name="quantity" class="form-control w-25" value="1" min="1" max="<%= product.stock %>" required>
-                                    <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">🛒 Tambah ke Keranjang</button>
-                                </div>
-                            </form>
-
-                            <!-- Wishlist Form -->
-                            <% if (inWishlist) { %>
-                                <form action="/wishlist/delete-by-product/<%= product.id %>" method="POST">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">❤️ Hapus dari Wishlist</button>
-                                </form>
-                            <% } else { %>
-                                <form action="/wishlist/add/<%= product.id %>" method="POST">
-                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                    <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">🤍 Simpan ke Wishlist</button>
-                                </form>
-                            <% } %>
-                        <% } else { %>
-                            <button class="btn btn-outline-secondary w-100 py-2 fw-bold" disabled>Hanya Pembeli yang Bisa Membeli</button>
-                        <% } %>
-                    <% } else { %>
-                        <div class="d-flex flex-column gap-2">
-                            <a href="/auth/login" class="btn btn-primary w-100 py-2 fw-bold">🛒 Tambah ke Keranjang (Perlu Login)</a>
-                            <a href="/auth/login" class="btn btn-outline-primary w-100 py-2 fw-bold">🤍 Simpan ke Wishlist (Perlu Login)</a>
+                    <% if (product.images && product.images.length > 1) { %>
+                        <div class="d-flex gap-2 flex-wrap justify-content-center pb-2">
+                            <% product.images.forEach((img, idx) => { %>
+                                <img src="<%= img.imagePath %>" class="thumbnail-img <%= img.isPrimary || (idx === 0 && !product.images.some(i => i.isPrimary)) ? 'active' : '' %>" onclick="changeImage(this, '<%= img.imagePath %>')" alt="Thumbnail">
+                            <% }) %>
                         </div>
                     <% } %>
                 </div>
+            </div>
 
-                <!-- Seller Info -->
+            <!-- Right Column: Product Details -->
+            <div class="col-lg-6">
+                <!-- Info Card -->
+                <div class="card p-4 p-md-5 border-0 shadow-sm mb-4">
+                    <div class="d-flex gap-2 mb-3">
+                        <span class="badge bg-primary px-3 py-2"><%= product.category.name %></span>
+                        <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %> px-3 py-2"><%= product.condition %></span>
+                    </div>
+                    
+                    <h1 class="fw-bold text-dark h2 mb-3" style="line-height: 1.3;"><%= product.name %></h1>
+                    
+                    <div class="mb-4 d-flex align-items-center gap-3">
+                        <% if (product.reviews && product.reviews.length > 0) { %>
+                            <div class="d-flex align-items-center bg-light px-3 py-2 rounded-pill">
+                                <i class="fas fa-star star-icon me-2"></i>
+                                <span class="fw-bold text-dark me-1"><%= averageRating %></span>
+                                <span class="text-muted small"> (<%= product.reviews.length %> ulasan)</span>
+                            </div>
+                        <% } else { %>
+                            <span class="text-muted small bg-light px-3 py-2 rounded-pill">Belum ada ulasan</span>
+                        <% } %>
+                        <span class="text-muted">|</span>
+                        <span class="text-muted small"><i class="fas fa-box me-1"></i> Sisa Stok: <strong class="text-dark"><%= product.stock %></strong></span>
+                    </div>
+                    
+                    <h2 class="fw-bold mb-4" style="color: var(--color-primary); font-size: 2.5rem; letter-spacing: -1px;">
+                        Rp <%= parseFloat(product.price).toLocaleString('id-ID') %>
+                    </h2>
+                    
+                    <h6 class="fw-bold text-dark text-uppercase" style="letter-spacing: 0.05em; font-size: 0.8rem;">Deskripsi Produk</h6>
+                    <p class="text-muted mb-4" style="white-space: pre-line; font-size: 1.05rem; line-height: 1.8;"><%= product.description %></p>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-auto pt-4 border-top">
+                        <% if (user) { %>
+                            <% if (user.role === 'PEMBELI') { %>
+                                <div class="row g-3">
+                                    <div class="col-md-7">
+                                        <form action="/cart/add/<%= product.id %>" method="POST" class="d-flex gap-2 h-100">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" style="width: 80px;" required>
+                                            <button type="submit" class="btn btn-primary flex-grow-1 fw-bold fs-6 shadow">
+                                                <i class="fas fa-shopping-cart me-2"></i> Masukkan Keranjang
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <% if (inWishlist) { %>
+                                            <form action="/wishlist/delete-by-product/<%= product.id %>" method="POST" class="h-100">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <button type="submit" class="btn btn-outline-danger w-100 h-100 fw-bold shadow-sm">
+                                                    <i class="fas fa-heart me-2"></i> Hapus Wishlist
+                                                </button>
+                                            </form>
+                                        <% } else { %>
+                                            <form action="/wishlist/add/<%= product.id %>" method="POST" class="h-100">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <button type="submit" class="btn btn-outline-primary w-100 h-100 fw-bold shadow-sm">
+                                                    <i class="far fa-heart me-2"></i> Simpan Wishlist
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <button class="btn btn-outline-secondary w-100 py-3 fw-bold rounded-pill" disabled>Hanya Pembeli yang Bisa Membeli</button>
+                            <% } %>
+                        <% } else { %>
+                            <div class="d-flex flex-column gap-3">
+                                <a href="/auth/login" class="btn btn-primary w-100 py-3 fw-bold shadow rounded-pill"><i class="fas fa-shopping-cart me-2"></i> Tambah ke Keranjang (Login)</a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Seller Info Card -->
                 <div class="card p-4 border-0 shadow-sm">
-                    <h5 class="fw-bold text-primary mb-3">Informasi Penjual</h5>
-                    <div class="d-flex align-items-center">
-                        <div class="bg-light p-3 rounded-circle me-3">
-                            <span class="fs-4">👤</span>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold text-dark text-uppercase mb-0" style="letter-spacing: 0.05em; font-size: 0.8rem;">Informasi Penjual</h6>
+                        <span class="badge bg-light text-muted rounded-pill px-3 py-1 border"><i class="fas fa-shield-alt me-1"></i> Terverifikasi</span>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center me-3 shadow-sm" style="width: 56px; height: 56px; font-size: 1.5rem;">
+                            <%= product.user.name.charAt(0).toUpperCase() %>
                         </div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0"><%= product.user.name %></h6>
-                            <p class="text-muted small mb-0">Mahasiswa Penjual</p>
+                            <h5 class="fw-bold text-dark mb-1"><%= product.user.name %></h5>
+                            <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i> Mahasiswa Aktif Kampus</p>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <p class="small text-muted mb-1">Email: <strong><%= product.user.email %></strong></p>
-                        <p class="small text-muted mb-2">Telepon/WA: <strong><%= product.user.phone || 'Tidak dicantumkan' %></strong></p>
-                        
+
+                    <div class="row g-2">
                         <% if (user) { %>
                             <% if (user.id !== product.userId) { %>
-                                <a href="/chat/initiate/<%= product.id %>" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">💬 Hubungi via Chat Internal</a>
+                                <div class="col-sm-6">
+                                    <a href="/chat/initiate/<%= product.id %>" class="btn btn-outline-primary w-100 fw-bold py-2">
+                                        <i class="fas fa-comment-dots me-2"></i> Chat Internal
+                                    </a>
+                                </div>
                             <% } %>
-                            <a href="https://wa.me/<%= product.user.phone ? product.user.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-success btn-sm w-100 mt-2 fw-bold">🟢 Hubungi via WhatsApp</a>
+                            <div class="col-sm-6">
+                                <a href="https://wa.me/<%= product.user.phone ? product.user.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-success w-100 fw-bold py-2 shadow-sm text-white">
+                                    <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                                </a>
+                            </div>
                         <% } else { %>
-                            <a href="/auth/login" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">Login untuk Hubungi Penjual</a>
+                            <div class="col-12">
+                                <a href="/auth/login" class="btn btn-outline-secondary w-100 fw-bold py-2">Login untuk Hubungi Penjual</a>
+                            </div>
                         <% } %>
                     </div>
                 </div>
@@ -149,61 +200,72 @@
         </div>
 
         <!-- Ulasan Produk Section -->
-        <div class="row mt-4">
+        <div class="row mt-5">
             <div class="col-12">
-                <div class="card p-4 border-0 shadow-sm">
-                    <h4 class="fw-bold mb-4">Ulasan Produk</h4>
+                <div class="card p-4 p-md-5 border-0 shadow-sm">
+                    <h4 class="fw-bold text-dark mb-4">Ulasan Pembeli</h4>
                     
                     <% if (messages && messages.success_msg) { %>
-                        <div class="alert alert-success"><%= messages.success_msg %></div>
+                        <div class="alert alert-success border-0 shadow-sm rounded-3"><%= messages.success_msg %></div>
                     <% } %>
                     <% if (messages && messages.error_msg) { %>
-                        <div class="alert alert-danger"><%= messages.error_msg %></div>
+                        <div class="alert alert-danger border-0 shadow-sm rounded-3"><%= messages.error_msg %></div>
                     <% } %>
 
                     <!-- Form Ulasan -->
                     <% if (user && user.role === 'PEMBELI' && hasCompletedOrder && !hasReviewed) { %>
-                        <div class="bg-light p-3 rounded mb-4">
-                            <h6 class="fw-bold">Beri Ulasan Anda</h6>
+                        <div class="bg-light p-4 rounded-4 mb-5 border">
+                            <h6 class="fw-bold text-dark mb-3">Bagikan Pengalaman Anda</h6>
                             <form action="/products/<%= product.id %>/review" method="POST">
                                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <div class="mb-3">
-                                    <label class="form-label">Rating (1-5)</label>
-                                    <select name="rating" class="form-select" required>
-                                        <option value="5">⭐⭐⭐⭐⭐ Sangat Bagus</option>
-                                        <option value="4">⭐⭐⭐⭐ Bagus</option>
-                                        <option value="3">⭐⭐⭐ Lumayan</option>
-                                        <option value="2">⭐⭐ Kurang</option>
-                                        <option value="1">⭐ Buruk</option>
+                                    <label class="form-label text-muted">Beri Rating</label>
+                                    <select name="rating" class="form-select w-auto" required>
+                                        <option value="5">⭐⭐⭐⭐⭐ (5) Sangat Bagus</option>
+                                        <option value="4">⭐⭐⭐⭐ (4) Bagus</option>
+                                        <option value="3">⭐⭐⭐ (3) Lumayan</option>
+                                        <option value="2">⭐⭐ (2) Kurang</option>
+                                        <option value="1">⭐ (1) Buruk</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Komentar (Opsional)</label>
-                                    <textarea name="comment" class="form-control" rows="3" placeholder="Tulis komentar tentang produk ini..."></textarea>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted">Tulis Komentar (Opsional)</label>
+                                    <textarea name="comment" class="form-control" rows="3" placeholder="Ceritakan kepuasan Anda terhadap barang ini..."></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-primary fw-bold">Kirim Ulasan</button>
+                                <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm rounded-pill">Kirim Ulasan</button>
                             </form>
                         </div>
                     <% } %>
 
                     <!-- Daftar Ulasan -->
                     <% if (product.reviews && product.reviews.length > 0) { %>
-                        <div class="list-group list-group-flush">
+                        <div class="row g-4">
                             <% product.reviews.forEach(review => { %>
-                                <div class="list-group-item px-0 py-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold text-dark"><%= review.user.name %></span>
-                                        <span class="text-muted small"><%= new Date(review.createdAt).toLocaleDateString('id-ID') %></span>
+                                <div class="col-md-6">
+                                    <div class="p-4 rounded-4 border bg-white h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center me-2" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                                    <%= review.user.name.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <span class="fw-bold text-dark"><%= review.user.name %></span>
+                                            </div>
+                                            <span class="text-muted small"><%= new Date(review.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %></span>
+                                        </div>
+                                        <div class="text-warning mb-3">
+                                            <% for(let i=0; i<review.rating; i++) { %><i class="fas fa-star"></i><% } %>
+                                            <% for(let i=0; i<(5-review.rating); i++) { %><i class="far fa-star"></i><% } %>
+                                        </div>
+                                        <p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;"><%= review.comment || 'Pembeli tidak meninggalkan komentar teks.' %></p>
                                     </div>
-                                    <div class="text-warning mb-2">
-                                        <% for(let i=0; i<review.rating; i++) { %>⭐<% } %>
-                                    </div>
-                                    <p class="mb-0 text-secondary"><%= review.comment || 'Tidak ada komentar.' %></p>
                                 </div>
                             <% }) %>
                         </div>
                     <% } else { %>
-                        <p class="text-muted">Produk ini belum memiliki ulasan.</p>
+                        <div class="text-center py-5">
+                            <i class="far fa-comment-dots text-muted" style="font-size: 3rem; opacity: 0.5;"></i>
+                            <p class="text-muted mt-3">Produk ini belum mendapatkan ulasan dari pembeli.</p>
+                        </div>
                     <% } %>
                 </div>
             </div>
@@ -212,12 +274,19 @@
 
     <script>
         function changeImage(element, path) {
-            document.getElementById('mainImage').src = path;
+            const mainImg = document.getElementById('mainImage');
+            mainImg.style.opacity = '0.5';
+            setTimeout(() => {
+                mainImg.src = path;
+                mainImg.style.opacity = '1';
+            }, 150);
+            
             const thumbnails = document.querySelectorAll('.thumbnail-img');
             thumbnails.forEach(thumb => thumb.classList.remove('active'));
             element.classList.add('active');
         }
     </script>
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/theme-toggle.js"></script>
 </body>
 </html>

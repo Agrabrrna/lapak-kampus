@@ -70,6 +70,11 @@
 
                 <!-- User Actions -->
                 <div class="d-flex align-items-center gap-3 ms-auto mt-3 mt-lg-0 border-start ps-lg-3">
+                    <li class="nav-item d-flex align-items-center me-2">
+                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
+                            <i class="fas fa-moon fs-5"></i>
+                        </button>
+                    </li>
                     <a href="/notifications" class="text-muted text-decoration-none position-relative" title="Notifikasi">
                         <i class="fas fa-bell fs-5"></i>
                         <% if (locals.unreadCount > 0) { %>
@@ -191,5 +196,7 @@
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/theme-toggle.js"></script>
 </body>
 </html>

@@ -17,7 +17,12 @@
             <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
             <div class="d-flex gap-3 align-items-center">
                 <a href="/products" class="btn btn-outline-light btn-sm">Ke Katalog</a>
-                <a href="/notifications" class="text-white text-decoration-none position-relative">
+                <li class="nav-item d-flex align-items-center me-2">
+                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
+                            <i class="fas fa-moon fs-5"></i>
+                        </button>
+                    </li>
+                    <a href="/notifications" class="text-white text-decoration-none position-relative">
                     🔔
                     <% if (locals.unreadCount > 0) { %>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
@@ -77,5 +82,7 @@
             </div>
         </div>
     </div>
+
+    <script src="/js/theme-toggle.js"></script>
 </body>
 </html>

@@ -58,7 +58,12 @@
                             <% } %>
                         </li>
                         <li class="nav-item position-relative me-3">
-                            <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
+                            <li class="nav-item d-flex align-items-center me-2">
+                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
+                            <i class="fas fa-moon fs-5"></i>
+                        </button>
+                    </li>
+                    <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
                                 🔔
                                 <% if (locals.unreadCount > 0) { %>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
@@ -244,5 +249,7 @@
         </div>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/theme-toggle.js"></script>
 </body>
 </html>
