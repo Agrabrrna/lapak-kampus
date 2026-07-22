@@ -40,37 +40,32 @@
                     
                     <div class="row mt-4">
                         <% if (user.role === 'PENJUAL') { %>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-primary p-3">
-                                    <h5>Kelola Produk Saya</h5>
-                                    <p>Unggah buku, laptop, atau alat praktikum yang ingin Anda jual.</p>
-                                    <a href="/seller/products" class="btn btn-primary btn-sm">Buka Produk Saya</a>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-success p-3">
-                                    <h5>Tambah Produk</h5>
-                                    <p>Mulai jual barang baru.</p>
-                                    <a href="/seller/products/add" class="btn btn-success btn-sm">Tambah Baru</a>
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-primary p-3 h-100">
+                                    <h5>Kelola Toko</h5>
+                                    <p class="text-muted small">Kelola produk dan pesanan masuk dari pembeli.</p>
+                                    <div class="d-flex flex-column gap-2 mt-auto">
+                                        <a href="/seller/products/add" class="btn btn-primary btn-sm text-start">➕ Tambah Produk Baru</a>
+                                        <a href="/seller/products" class="btn btn-outline-primary btn-sm text-start">📦 Kelola Produk Saya</a>
+                                        <a href="/orders/incoming" class="btn btn-outline-primary btn-sm text-start">📋 Pesanan Masuk</a>
+                                    </div>
                                 </div>
                             </div>
                         <% } else { %>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-primary p-3">
-                                    <h5>Cari Produk</h5>
-                                    <p>Temukan buku, laptop, dan kebutuhan praktikum murah di sini.</p>
-                                    <a href="/products" class="btn btn-primary btn-sm">Mulai Belanja</a>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card border-success p-3">
-                                    <h5>Wishlist</h5>
-                                    <p>Lihat barang favorit yang Anda simpan.</p>
-                                    <a href="/wishlist" class="btn btn-success btn-sm">Lihat Wishlist</a>
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-primary p-3 h-100">
+                                    <h5>Menu Pembeli</h5>
+                                    <p class="text-muted small">Cari produk, lihat keranjang, dan pantau pesanan Anda.</p>
+                                    <div class="d-flex flex-column gap-2 mt-auto">
+                                        <a href="/products" class="btn btn-primary btn-sm text-start">🛍️ Mulai Belanja</a>
+                                        <a href="/cart" class="btn btn-outline-primary btn-sm text-start">🛒 Keranjang Belanja</a>
+                                        <a href="/orders/my-orders" class="btn btn-outline-primary btn-sm text-start">📦 Pesanan Saya</a>
+                                        <a href="/wishlist" class="btn btn-outline-primary btn-sm text-start">❤️ Wishlist Saya</a>
+                                    </div>
                                 </div>
                             </div>
                         <% } %>
-                         <div class="col-md-4 mb-3">
+                         <div class="col-md-6 mb-3">
                             <div class="card border-info p-3">
                                 <h5>Kotak Pesan (Chat)</h5>
                                 <p>Komunikasi langsung dengan penjual / pembeli.</p>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/cart">KampusLapak</a>
+            <a href="/cart" class="btn btn-outline-light btn-sm">Kembali ke Keranjang</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="fw-bold mb-4">💳 Checkout Pesanan</h2>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Detail Pesanan (Penjual: <%= sellerCart.sellerName %>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless align-middle">
+                            <thead class="border-bottom">
+                                <tr>
+                                    <th>Produk</th>
+                                    <th class="text-center">Harga</th>
+                                    <th class="text-center">Kuantitas</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% sellerCart.items.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="<%= item.image || 'https://placehold.co/40' %>" alt="Product" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                                <span><%= item.name %></span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">Rp <%= parseFloat(item.price).toLocaleString('id-ID') %></td>
+                                        <td class="text-center"><%= item.quantity %></td>
+                                        <td class="text-end fw-bold">Rp <%= parseFloat(item.price * item.quantity).toLocaleString('id-ID') %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Ringkasan Belanja</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Total Harga (<%= sellerCart.items.length %> barang)</span>
+                            <span class="fw-bold">Rp <%= total.toLocaleString('id-ID') %></span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="fw-bold mb-0">Total Tagihan</h5>
+                            <h5 class="fw-bold text-danger mb-0">Rp <%= total.toLocaleString('id-ID') %></h5>
+                        </div>
+
+                        <form action="/checkout/<%= sellerId %>" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-success w-100 py-2 fw-bold text-uppercase">Buat Pesanan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

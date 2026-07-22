@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .status-badge {
+            font-size: 0.85rem;
+            padding: 0.4em 0.8em;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
+            <a href="/user/dashboard" class="btn btn-outline-light btn-sm">Kembali ke Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="fw-bold mb-4">📋 Pesanan Masuk</h2>
+
+        <% if (messages.success_msg) { %>
+            <div class="alert alert-success"><%= messages.success_msg %></div>
+        <% } %>
+        <% if (messages.error_msg) { %>
+            <div class="alert alert-danger"><%= messages.error_msg %></div>
+        <% } %>
+
+        <% if (orders.length === 0) { %>
+            <div class="card p-5 text-center border-0 shadow-sm">
+                <h4 class="text-muted">Belum ada pesanan masuk.</h4>
+            </div>
+        <% } else { %>
+            <% orders.forEach(order => { %>
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small">ID Pesanan: <%= order.id %> | <%= new Date(order.createdAt).toLocaleDateString('id-ID') %></span>
+                            <h6 class="mb-0 fw-bold mt-1">Pembeli: <%= order.buyer.name %></h6>
+                        </div>
+                        <div>
+                            <% if (order.status === 'PENDING') { %>
+                                <span class="badge bg-warning text-dark status-badge">Menunggu Konfirmasi</span>
+                            <% } else if (order.status === 'DIPROSES') { %>
+                                <span class="badge bg-info text-dark status-badge">Sedang Diproses</span>
+                            <% } else if (order.status === 'SELESAI') { %>
+                                <span class="badge bg-success status-badge">Selesai</span>
+                            <% } else if (order.status === 'DIBATALKAN') { %>
+                                <span class="badge bg-danger status-badge">Dibatalkan</span>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <% order.orderDetails.forEach(detail => { %>
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <div>
+                                    <h6 class="mb-0"><%= detail.product.name %></h6>
+                                    <small class="text-muted"><%= detail.quantity %> x Rp <%= parseFloat(detail.price).toLocaleString('id-ID') %></small>
+                                </div>
+                                <div class="fw-bold">Rp <%= parseFloat(detail.subtotal).toLocaleString('id-ID') %></div>
+                            </div>
+                        <% }) %>
+                        
+                        <div class="mt-3">
+                            <p class="mb-1 small">Email Pembeli: <strong><%= order.buyer.email %></strong></p>
+                            <p class="mb-3 small">No. HP / WA: <strong><%= order.buyer.phone || '-' %></strong></p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <h5 class="fw-bold mb-0">Pendapatan: Rp <%= parseFloat(order.totalPrice).toLocaleString('id-ID') %></h5>
+                            
+                            <!-- Action Buttons based on status -->
+                            <div class="d-flex gap-2">
+                                <% if (order.status === 'PENDING') { %>
+                                    <form action="/orders/<%= order.id %>/status" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="newStatus" value="DIPROSES">
+                                        <button type="submit" class="btn btn-primary btn-sm fw-bold">Terima & Proses</button>
+                                    </form>
+                                    <form action="/orders/<%= order.id %>/status" method="POST" onsubmit="return confirm('Yakin ingin menolak pesanan ini?');">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="newStatus" value="DIBATALKAN">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">Tolak Pesanan</button>
+                                    </form>
+                                <% } %>
+                                <% if (order.status === 'DIPROSES') { %>
+                                    <!-- Seller could also mark as completed or canceled if needed -->
+                                    <button class="btn btn-secondary btn-sm fw-bold" disabled>Menunggu Pembeli Menyelesaikan</button>
+                                <% } %>
+                                <a href="https://wa.me/<%= order.buyer.phone ? order.buyer.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-outline-success btn-sm fw-bold">Hubungi Pembeli</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</body>
+</html>

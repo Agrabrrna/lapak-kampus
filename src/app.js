@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,9 @@ app.use(session({
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 24 hours
 }));
 
+// Flash middleware
+app.use(flash());
+
 // CSRF Protection
 app.use(csrf());
 
@@ -34,6 +38,7 @@ app.use(csrf());
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   res.locals.user = req.session.user || null;
+  res.locals.messages = req.flash();
   next();
 });
 
@@ -44,6 +49,7 @@ const productRoutes = require('./routes/productRoutes');
 const catalogRoutes = require('./routes/catalogRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // Use Routes
 app.use('/auth', authRoutes);
@@ -52,6 +58,7 @@ app.use('/', productRoutes);
 app.use('/', catalogRoutes);
 app.use('/', wishlistRoutes);
 app.use('/', chatRoutes);
+app.use('/', orderRoutes);
 
 // Home route redirect
 app.get('/', (req, res) => {

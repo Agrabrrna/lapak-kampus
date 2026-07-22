@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .cart-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
+            <a href="/products" class="btn btn-outline-light btn-sm">Lanjut Belanja</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="fw-bold mb-4">🛒 Keranjang Belanja</h2>
+
+        <% if (messages.success_msg) { %>
+            <div class="alert alert-success"><%= messages.success_msg %></div>
+        <% } %>
+        <% if (messages.error_msg) { %>
+            <div class="alert alert-danger"><%= messages.error_msg %></div>
+        <% } %>
+
+        <% if (Object.keys(cart).length === 0) { %>
+            <div class="card p-5 text-center border-0 shadow-sm">
+                <h4 class="text-muted">Keranjang Anda masih kosong.</h4>
+                <a href="/products" class="btn btn-primary mt-3 w-25 mx-auto">Mulai Belanja</a>
+            </div>
+        <% } else { %>
+            <% Object.keys(cart).forEach(sellerId => { %>
+                <% const sellerCart = cart[sellerId]; %>
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 fw-bold">Penjual: <%= sellerCart.sellerName %></h5>
+                    </div>
+                    <div class="card-body">
+                        <% let sellerTotal = 0; %>
+                        <% sellerCart.items.forEach(item => { %>
+                            <% sellerTotal += item.price * item.quantity; %>
+                            <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
+                                <img src="<%= item.image || 'https://placehold.co/80' %>" alt="<%= item.name %>" class="cart-img me-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold mb-1"><a href="/products/<%= item.productId %>" class="text-decoration-none text-dark"><%= item.name %></a></h6>
+                                    <p class="text-muted mb-0">Rp <%= parseFloat(item.price).toLocaleString('id-ID') %> x <%= item.quantity %></p>
+                                </div>
+                                <div class="text-end me-4">
+                                    <h6 class="fw-bold text-danger mb-0">Rp <%= parseFloat(item.price * item.quantity).toLocaleString('id-ID') %></h6>
+                                </div>
+                                <div>
+                                    <form action="/cart/remove/<%= sellerId %>/<%= item.productId %>" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
+                                </div>
+                            </div>
+                        <% }) %>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <h5 class="fw-bold mb-0">Total: Rp <%= sellerTotal.toLocaleString('id-ID') %></h5>
+                            <a href="/checkout/<%= sellerId %>" class="btn btn-success fw-bold px-4">Checkout dari Penjual Ini</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    </div>
+</body>
+</html>

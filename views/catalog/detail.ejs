@@ -72,9 +72,20 @@
                     
                     <hr>
 
-                    <!-- Wishlist Button Form -->
+                    <!-- Cart and Wishlist Actions -->
                     <% if (user) { %>
                         <% if (user.role === 'PEMBELI') { %>
+                            
+                            <!-- Add to Cart Form -->
+                            <form action="/cart/add/<%= product.id %>" method="POST" class="mb-3">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <div class="d-flex gap-2">
+                                    <input type="number" name="quantity" class="form-control w-25" value="1" min="1" max="<%= product.stock %>" required>
+                                    <button type="submit" class="btn btn-primary flex-grow-1 fw-bold">🛒 Tambah ke Keranjang</button>
+                                </div>
+                            </form>
+
+                            <!-- Wishlist Form -->
                             <% if (inWishlist) { %>
                                 <form action="/wishlist/delete-by-product/<%= product.id %>" method="POST">
                                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -87,10 +98,13 @@
                                 </form>
                             <% } %>
                         <% } else { %>
-                            <button class="btn btn-outline-secondary w-100 py-2 fw-bold" disabled>Hanya Pembeli yang Bisa Menyimpan Wishlist</button>
+                            <button class="btn btn-outline-secondary w-100 py-2 fw-bold" disabled>Hanya Pembeli yang Bisa Membeli</button>
                         <% } %>
                     <% } else { %>
-                        <a href="/auth/login" class="btn btn-outline-primary w-100 py-2 fw-bold">🤍 Simpan ke Wishlist (Perlu Login)</a>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="/auth/login" class="btn btn-primary w-100 py-2 fw-bold">🛒 Tambah ke Keranjang (Perlu Login)</a>
+                            <a href="/auth/login" class="btn btn-outline-primary w-100 py-2 fw-bold">🤍 Simpan ke Wishlist (Perlu Login)</a>
+                        </div>
                     <% } %>
                 </div>
 
