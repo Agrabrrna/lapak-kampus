@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/seller/products">KampusLapak (Seller Panel)</a>
+            <a href="/seller/products" class="btn btn-outline-light btn-sm">Kembali ke Daftar Produk</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4 shadow-sm">
+                    <h2 class="text-primary fw-bold mb-4">Tambah Produk Baru</h2>
+
+                    <% if (errors && errors.length > 0) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <ul class="mb-0">
+                                <% errors.forEach(error => { %>
+                                    <li><%= error.msg %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+
+                    <form action="/seller/products/add?_csrf=<%= csrfToken %>" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-bold">Nama Produk</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<%= data.name || '' %>" required placeholder="Masukkan nama produk (misal: Buku Kalkulus Edisi 9)">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label fw-bold">Harga (Rp)</label>
+                                <input type="number" class="form-control" id="price" name="price" value="<%= data.price || '' %>" required placeholder="Contoh: 50000">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="stock" class="form-label fw-bold">Stok</label>
+                                <input type="number" class="form-control" id="stock" name="stock" value="<%= data.stock || '' %>" required placeholder="Contoh: 1">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="condition" class="form-label fw-bold">Kondisi</label>
+                                <select class="form-select" id="condition" name="condition" required>
+                                    <option value="BARU" <%= data.condition === 'BARU' ? 'selected' : '' %>>Baru</option>
+                                    <option value="BEKAS" <%= data.condition === 'BEKAS' || !data.condition ? 'selected' : '' %>>Bekas / Second</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryId" class="form-label fw-bold">Kategori</label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <option value="" disabled <%= !data.categoryId ? 'selected' : '' %>>Pilih Kategori</option>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category.id %>" <%= data.categoryId === category.id ? 'selected' : '' %>><%= category.name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">Deskripsi Produk</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required placeholder="Jelaskan kondisi barang, kelengkapan, alasan dijual, atau detail lainnya."><%= data.description || '' %></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="images" class="form-label fw-bold">Gambar Produk (Maksimal 5 Gambar, JPG/PNG, Maksimal 2MB per file)</label>
+                            <input class="form-control" type="file" id="images" name="images" multiple accept="image/*">
+                            <small class="text-muted">Gambar pertama yang Anda pilih akan otomatis menjadi gambar utama produk Anda.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2">Tambah Produk</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

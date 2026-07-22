@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .product-img {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak (Seller Panel)</a>
+            <div class="ms-auto align-items-center d-flex">
+                <span class="text-white me-3">Halo, <%= user.name %></span>
+                <form action="/auth/logout" method="POST" class="m-0">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary fw-bold">Daftar Produk Saya</h2>
+            <a href="/seller/products/add" class="btn btn-success">➕ Tambah Produk</a>
+        </div>
+
+        <% if (success) { %>
+            <div class="alert alert-success" role="alert">
+                <%= success %>
+            </div>
+        <% } %>
+
+        <% if (error) { %>
+            <div class="alert alert-danger" role="alert">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (products.length === 0) { %>
+            <div class="card p-5 text-center shadow-sm">
+                <h4 class="text-muted">Anda belum memiliki produk yang terdaftar.</h4>
+                <p class="text-muted">Mulai tawarkan barang Anda kepada mahasiswa lain dengan mengklik tombol Tambah Produk!</p>
+                <div>
+                    <a href="/seller/products/add" class="btn btn-primary">Mulai Jual Barang</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="row">
+                <% products.forEach(product => { %>
+                    <% 
+                        // Find primary image or default
+                        const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
+                        const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/300x200?text=No+Image';
+                    %>
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img src="<%= imgPath %>" class="card-img-top product-img" alt="<%= product.name %>">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2"><%= product.category.name %></span>
+                                <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %> mb-2"><%= product.condition %></span>
+                                <h5 class="card-title fw-bold text-dark"><%= product.name %></h5>
+                                <p class="card-text text-danger fw-bold fs-5">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></p>
+                                <p class="card-text text-muted">Stok: <%= product.stock %> | Kondisi: <%= product.condition %></p>
+                                <p class="card-text text-truncate"><%= product.description %></p>
+                            </div>
+                            <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3">
+                                <a href="/seller/products/edit/<%= product.id %>" class="btn btn-outline-primary btn-sm px-3">✏️ Edit</a>
+                                <form action="/seller/products/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');" class="m-0">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3">🗑️ Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

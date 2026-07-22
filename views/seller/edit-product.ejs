@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .edit-img-thumbnail {
+            height: 100px;
+            object-fit: cover;
+            width: 100px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/seller/products">KampusLapak (Seller Panel)</a>
+            <a href="/seller/products" class="btn btn-outline-light btn-sm">Kembali ke Daftar Produk</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4 shadow-sm">
+                    <h2 class="text-primary fw-bold mb-4">Edit Produk</h2>
+
+                    <% if (errors && errors.length > 0) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <ul class="mb-0">
+                                <% errors.forEach(error => { %>
+                                    <li><%= error.msg %></li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% } %>
+
+                    <form action="/seller/products/edit/<%= product.id %>?_csrf=<%= csrfToken %>" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-bold">Nama Produk</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="price" class="form-label fw-bold">Harga (Rp)</label>
+                                <input type="number" class="form-control" id="price" name="price" value="<%= product.price %>" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="stock" class="form-label fw-bold">Stok</label>
+                                <input type="number" class="form-control" id="stock" name="stock" value="<%= product.stock %>" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="condition" class="form-label fw-bold">Kondisi</label>
+                                <select class="form-select" id="condition" name="condition" required>
+                                    <option value="BARU" <%= product.condition === 'BARU' ? 'selected' : '' %>>Baru</option>
+                                    <option value="BEKAS" <%= product.condition === 'BEKAS' ? 'selected' : '' %>>Bekas</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryId" class="form-label fw-bold">Kategori</label>
+                                <select class="form-select" id="categoryId" name="categoryId" required>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category.id %>" <%= product.categoryId === category.id ? 'selected' : '' %>><%= category.name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">Deskripsi Produk</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required><%= product.description %></textarea>
+                        </div>
+
+                        <!-- Current Images Section -->
+                        <% if (product.images && product.images.length > 0) { %>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold d-block">Gambar Saat Ini (Pilih satu sebagai gambar utama)</label>
+                                <div class="row g-3">
+                                    <% product.images.forEach(img => { %>
+                                        <div class="col-auto text-center">
+                                            <img src="<%= img.imagePath %>" class="edit-img-thumbnail d-block mb-2" alt="Product Image">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="primaryImageId" id="img-<%= img.id %>" value="<%= img.id %>" <%= img.isPrimary ? 'checked' : '' %>>
+                                                <label class="form-check-label text-muted small" for="img-<%= img.id %>">
+                                                    <%= img.isPrimary ? 'Utama' : 'Jadikan Utama' %>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <!-- Upload New Images -->
+                        <div class="mb-4">
+                            <label for="images" class="form-label fw-bold">Tambah Gambar Baru (Maksimal 5 Gambar, JPG/PNG, Maksimal 2MB per file)</label>
+                            <input class="form-control" type="file" id="images" name="images" multiple accept="image/*">
+                            <small class="text-muted">Akan ditambahkan ke daftar gambar di atas.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
