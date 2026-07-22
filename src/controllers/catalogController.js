@@ -91,6 +91,56 @@ const getCatalog = async (req, res) => {
   }
 };
 
+const getProductDetail = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        images: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+            phone: true
+          }
+        }
+      }
+    });
+
+    if (!product) {
+      return res.status(404).send('Produk tidak ditemukan.');
+    }
+
+    // Check if product is in logged-in user's wishlist
+    let inWishlist = false;
+    if (req.session.userId) {
+      const wishlistEntry = await prisma.wishlist.findFirst({
+        where: {
+          userId: req.session.userId,
+          productId: id
+        }
+      });
+      if (wishlistEntry) {
+        inWishlist = true;
+      }
+    }
+
+    res.render('catalog/detail', {
+      title: product.name + ' - KampusLapak',
+      product,
+      inWishlist
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Terjadi kesalahan pada server saat memuat detail produk.');
+  }
+};
+
 module.exports = {
-  getCatalog
+  getCatalog,
+  getProductDetail
 };

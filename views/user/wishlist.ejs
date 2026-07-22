@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <style>
+        .product-img {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white me-3 small">Halo, <%= user.name %></span>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/auth/logout" method="POST" class="m-0">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 mb-5">
+        <h2 class="text-primary fw-bold mb-4">❤️ Wishlist Saya</h2>
+
+        <% if (wishlistItems.length === 0) { %>
+            <div class="card p-5 text-center shadow-sm border-0">
+                <h4 class="text-muted fw-bold">Wishlist Anda masih kosong</h4>
+                <p class="text-muted">Jelajahi produk berkualitas tinggi yang ditawarkan oleh mahasiswa lain!</p>
+                <div>
+                    <a href="/products" class="btn btn-primary">Cari Barang Sekarang</a>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="row">
+                <% wishlistItems.forEach(item => { %>
+                    <% 
+                        const product = item.product;
+                        const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
+                        const imgPath = primaryImg ? primaryImg.imagePath : 'https://placehold.co/300x200?text=No+Image';
+                    %>
+                    <div class="col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm border-0">
+                            <img src="<%= imgPath %>" class="card-img-top product-img" alt="<%= product.name %>">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2"><%= product.category.name %></span>
+                                <span class="badge bg-<%= product.condition === 'BARU' ? 'success' : 'warning' %> mb-2"><%= product.condition %></span>
+                                <h5 class="card-title fw-bold text-dark"><%= product.name %></h5>
+                                <p class="card-text text-danger fw-bold fs-5">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></p>
+                                <p class="card-text text-muted small">Stok: <%= product.stock %></p>
+                            </div>
+                            <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3">
+                                <a href="/products/<%= product.id %>" class="btn btn-primary btn-sm px-3">Lihat Detail</a>
+                                <form action="/wishlist/delete/<%= item.id %>" method="POST" class="m-0">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3">🗑️ Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
