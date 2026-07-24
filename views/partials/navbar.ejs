@@ -40,21 +40,21 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 
                 <!-- Theme Toggle -->
-                <li class="nav-item d-flex align-items-center">
-                    <button class="theme-toggle-btn btn btn-link nav-link p-2 border-0 text-decoration-none" title="Toggle Dark Mode" style="font-size: 1.2rem; line-height: 1; opacity: 0.6; transition: opacity 0.3s ease;">
+                <li class="nav-item d-flex align-items-center justify-content-center">
+                    <button class="theme-toggle-btn btn btn-link nav-link border-0 text-decoration-none d-flex align-items-center justify-content-center m-0" title="Toggle Dark Mode" style="font-size: 1.25rem; opacity: 0.6; transition: opacity 0.3s ease; padding: 0.5rem;">
                         <i class="fas fa-moon"></i>
                     </button>
                 </li>
 
                 <% if (locals.user) { %>
                     <!-- Notifications -->
-                    <li class="nav-item">
-                        <a href="/notifications" class="nav-link d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 position-relative text-decoration-none rounded-3 text-dark fw-medium">
-                            <div class="position-relative d-inline-block" style="width: 24px; text-align: center;">
-                                <i class="fas fa-bell text-muted fs-5"></i>
+                    <li class="nav-item d-flex align-items-center justify-content-center">
+                        <a href="/notifications" class="nav-link d-flex align-items-center gap-3 px-3 px-lg-2 position-relative text-decoration-none rounded-3 text-dark fw-medium m-0" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                            <div class="position-relative d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">
+                                <i class="fas fa-bell text-muted" style="font-size: 1.25rem;"></i>
                                 <% if (locals.unreadCount > 0) { %>
                                     <!-- Dot badge for desktop -->
-                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none d-lg-block">
+                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none d-lg-block" style="margin-top: 2px;">
                                         <span class="visually-hidden">New alerts</span>
                                     </span>
                                 <% } %>
@@ -71,8 +71,8 @@
                     <hr class="d-lg-none border-secondary opacity-10 mx-3 my-2">
 
                     <!-- Desktop User Info -->
-                    <li class="nav-item d-none d-lg-block ms-lg-3 me-lg-3">
-                        <span class="text-muted small fw-bold">Halo, <%= user.name %></span>
+                    <li class="nav-item d-none d-lg-flex align-items-center ms-lg-2 me-lg-3">
+                        <span class="text-muted fw-bold m-0" style="font-size: 0.95rem; padding: 0.5rem 0;">Halo, <%= user.name %></span>
                     </li>
                     
                     <!-- Mobile User Info -->
