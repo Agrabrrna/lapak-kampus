@@ -5,36 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <style>
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-        }
-        .msg-bubble {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-        .msg-incoming {
-            background-color: #ffffff;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-            border: 1px solid #e9ecef;
-        }
-        .msg-outgoing {
-            background-color: #0d6efd;
-            color: #ffffff;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-    </style>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -43,7 +14,13 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
-            <a href="/chat/inbox" class="btn btn-outline-light btn-sm">Kembali ke Kotak Masuk</a>
+            
+            <div class="ms-auto d-flex align-items-center">
+                <button class="btn btn-link nav-link theme-toggle-btn p-2 me-3" title="Toggle Dark Mode">
+                    <i class="fas fa-moon fs-5 text-muted"></i>
+                </button>
+                <a href="/chat/inbox" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">Kembali ke Kotak Masuk</a>
+            </div>
         </div>
     </nav>
 
@@ -60,31 +37,31 @@
                                 <h6 class="fw-bold mb-0 text-dark"><%= product.name %></h6>
                                 <p class="text-danger small fw-bold mb-0">Rp <%= parseFloat(product.price).toLocaleString('id-ID') %></p>
                             </div>
-                            <a href="/products/<%= product.id %>" class="btn btn-outline-primary btn-sm">Lihat Detail Produk</a>
+                            <a href="/products/<%= product.id %>" class="btn btn-outline-primary btn-sm rounded-pill fw-bold">Lihat Detail</a>
                         </div>
                     </div>
                 <% } %>
 
                 <!-- Chat Card -->
-                <div class="card shadow-sm border-0">
+                <div class="card shadow border-0">
                     <div class="card-header bg-white border-bottom py-3 d-flex align-items-center">
-                        <div class="bg-light p-2 rounded-circle me-3">
-                            <span>👤</span>
+                        <div class="bg-primary text-white p-2 rounded-circle me-3 d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
                         </div>
                         <div>
                             <h5 class="fw-bold text-dark mb-0"><%= otherUser.name %></h5>
-                            <span class="badge bg-secondary small"><%= otherUser.role %></span>
+                            <span class="badge bg-light text-muted border small"><%= otherUser.role %></span>
                         </div>
                     </div>
                     
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <!-- Messages Container -->
-                        <div class="chat-box d-flex flex-column" id="chatBox">
+                        <div class="chat-box d-flex flex-column m-3" id="chatBox">
                             <% messages.forEach(msg => { %>
                                 <% const isMe = msg.senderId === user.id; %>
                                 <div class="msg-bubble <%= isMe ? 'msg-outgoing' : 'msg-incoming' %>">
-                                    <p class="mb-1"><%= msg.message %></p>
-                                    <small class="d-block text-end <%= isMe ? 'text-white-50' : 'text-muted' %>" style="font-size: 0.75rem;">
+                                    <p class="mb-1 fw-medium" style="line-height: 1.4;"><%= msg.message %></p>
+                                    <small class="d-block text-end chat-time mt-1" style="font-size: 0.7rem; font-weight: 500;">
                                         <%= new Date(msg.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
                                     </small>
                                 </div>
@@ -96,8 +73,10 @@
                     <div class="card-footer bg-white border-top py-3">
                         <form id="chatForm" class="d-flex gap-2">
                             <input type="hidden" name="_csrf" id="csrfToken" value="<%= csrfToken %>">
-                            <input type="text" id="messageInput" name="message" class="form-control" placeholder="Tulis pesan Anda..." required autocomplete="off">
-                            <button type="submit" class="btn btn-primary px-4 fw-bold">Kirim</button>
+                            <input type="text" id="messageInput" name="message" class="form-control rounded-pill px-4" placeholder="Ketik pesan Anda di sini..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -146,7 +125,6 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    // Append sent message immediately
                     appendMessage(data.chat);
                     scrollToBottom();
                 } else {
@@ -166,8 +144,8 @@
             const time = new Date(chat.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             
             bubble.innerHTML = `
-                <p class="mb-1">${escapeHtml(chat.message)}</p>
-                <small class="d-block text-end ${isMe ? 'text-white-50' : 'text-muted'}" style="font-size: 0.75rem;">${time}</small>
+                <p class="mb-1 fw-medium" style="line-height: 1.4;">${escapeHtml(chat.message)}</p>
+                <small class="d-block text-end chat-time mt-1" style="font-size: 0.7rem; font-weight: 500;">${time}</small>
             `;
             chatBox.appendChild(bubble);
         };
@@ -190,7 +168,6 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (data.messages.length > messageCount) {
-                        // Clear and redraw chat box to ensure ordering
                         chatBox.innerHTML = '';
                         data.messages.forEach(msg => appendMessage(msg));
                         messageCount = data.messages.length;
@@ -202,11 +179,9 @@
             }
         };
 
-        // Poll every 3 seconds
         setInterval(pollMessages, 3000);
     </script>
     <script src="/js/bootstrap.bundle.min.js"></script>
-
     <script src="/js/theme-toggle.js"></script>
 </body>
 </html>

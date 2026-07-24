@@ -5,16 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <style>
-        .thread-item {
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .thread-item:hover {
-            background-color: #f1f3f9;
-        }
-    </style>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -33,15 +24,15 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
+                        <a class="btn btn-outline-primary btn-sm me-3 rounded-pill px-3 fw-bold" href="/user/dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <span class="text-white me-3 small">Halo, <%= user.name %></span>
+                        <span class="text-muted me-3 small fw-bold">Halo, <%= user.name %></span>
                     </li>
                     <li class="nav-item">
                         <form action="/auth/logout" method="POST" class="m-0">
                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
+                            <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3 fw-bold">Keluar</button>
                         </form>
                     </li>
                 </ul>
@@ -55,36 +46,39 @@
 
         <% if (threads.length === 0) { %>
             <div class="card p-5 text-center shadow-sm border-0">
+                <div class="mb-3">
+                    <i class="far fa-comments fs-1 text-muted opacity-50"></i>
+                </div>
                 <h4 class="text-muted fw-bold">Belum ada percakapan</h4>
                 <p class="text-muted">Chat dengan penjual atau pembeli akan muncul di sini.</p>
-                <div>
-                    <a href="/products" class="btn btn-primary">Cari Barang dan Hubungi Penjual</a>
+                <div class="mt-2">
+                    <a href="/products" class="btn btn-primary rounded-pill px-4 fw-bold">Cari Barang dan Hubungi Penjual</a>
                 </div>
             </div>
         <% } else { %>
             <div class="row justify-content-center">
                 <div class="col-md-10">
-                    <div class="card shadow-sm border-0">
-                        <div class="list-group list-group-flush">
+                    <div class="card shadow border-0">
+                        <div class="list-group list-group-flush rounded-3">
                             <% threads.forEach(thread => { %>
-                                <a href="/chat/room/<%= thread.otherUser.id %>/<%= thread.product ? thread.product.id : 'no-product' %>" class="list-group-item list-group-item-action thread-item p-4 d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-light p-3 rounded-circle me-3">
-                                            <span class="fs-4">👤</span>
+                                <a href="/chat/room/<%= thread.otherUser.id %>/<%= thread.product ? thread.product.id : 'no-product' %>" class="list-group-item list-group-item-action thread-item p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center text-decoration-none">
+                                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                                        <div class="bg-primary text-white p-3 rounded-circle me-3 d-flex justify-content-center align-items-center shadow-sm" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-user fs-5"></i>
                                         </div>
                                         <div>
                                             <h6 class="fw-bold mb-1 text-dark"><%= thread.otherUser.name %></h6>
                                             <% if (thread.product) { %>
-                                                <p class="text-primary mb-1 small">
-                                                    📦 Produk: <strong><%= thread.product.name %></strong> (Rp <%= parseFloat(thread.product.price).toLocaleString('id-ID') %>)
+                                                <p class="text-primary mb-1 small fw-medium">
+                                                    📦 <strong><%= thread.product.name %></strong> <span class="text-muted">(Rp <%= parseFloat(thread.product.price).toLocaleString('id-ID') %>)</span>
                                                 </p>
                                             <% } %>
                                             <p class="text-muted mb-0 small text-truncate" style="max-width: 400px;"><%= thread.lastMessage %></p>
                                         </div>
                                     </div>
-                                    <div class="text-end">
-                                        <small class="text-muted"><%= new Date(thread.lastMessageTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %></small>
-                                        <div class="text-muted small"><%= new Date(thread.lastMessageTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) %></div>
+                                    <div class="text-md-end text-start ms-5 ms-md-0 pl-3 pl-md-0">
+                                        <div class="badge bg-light text-muted border mb-1"><%= new Date(thread.lastMessageTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %></div>
+                                        <div class="text-muted small d-block"><%= new Date(thread.lastMessageTime).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) %></div>
                                     </div>
                                 </a>
                             <% }) %>
@@ -95,7 +89,6 @@
         <% } %>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
-
     <script src="/js/theme-toggle.js"></script>
 </body>
 </html>
