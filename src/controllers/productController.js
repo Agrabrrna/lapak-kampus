@@ -329,9 +329,9 @@ const postDeleteProduct = async (req, res) => {
   } catch (err) {
     console.error(err);
     
-    let errorMessage = 'Terjadi kesalahan saat menghapus produk.';
-    // Prisma Foreign Key constraint error (P2003)
-    if (err.code === 'P2003') {
+    let errorMessage = `Terjadi kesalahan saat menghapus produk. Detail: ${err.message || err}`;
+    // Prisma Foreign Key constraint error (P2003) or Raw Postgres Error (OrderDetail_productId_fkey)
+    if (err.code === 'P2003' || (err.message && err.message.includes('OrderDetail_productId_fkey'))) {
       errorMessage = 'Produk tidak dapat dihapus karena sudah terkait dengan riwayat pesanan pembeli. Jika produk ini tidak dijual lagi, pertimbangkan untuk mengubah stok menjadi 0.';
     }
 
