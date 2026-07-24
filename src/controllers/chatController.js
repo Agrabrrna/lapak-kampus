@@ -103,16 +103,18 @@ const getChatRoom = async (req, res) => {
       return res.status(404).send('User lawan bicara tidak ditemukan.');
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
+    const prodId = productId === 'no-product' ? null : productId;
+
+    const product = prodId ? await prisma.product.findUnique({
+      where: { id: prodId },
       select: { id: true, name: true, price: true }
-    });
+    }) : null;
 
     const messages = await prisma.chat.findMany({
       where: {
         OR: [
-          { senderId: userId, receiverId: otherUserId, productId },
-          { senderId: otherUserId, receiverId: userId, productId }
+          { senderId: userId, receiverId: otherUserId, productId: prodId },
+          { senderId: otherUserId, receiverId: userId, productId: prodId }
         ]
       },
       include: {
@@ -122,11 +124,12 @@ const getChatRoom = async (req, res) => {
     });
 
     // Mark all unread messages from other user as read
+    const actualProductId = prodId;
     await prisma.chat.updateMany({
       where: {
         senderId: otherUserId,
         receiverId: userId,
-        productId,
+        productId: actualProductId,
         isRead: false
       },
       data: { isRead: true }
