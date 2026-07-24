@@ -20,23 +20,34 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setTheme(getPreferredTheme());
     
-    const showActiveTheme = (theme) => {
-        const themeToggles = document.querySelectorAll('.theme-toggle-btn');
-        if (!themeToggles.length) return;
-        
-        themeToggles.forEach(btn => {
-            const icon = btn.querySelector('i');
+    const updateToggleVisual = (theme) => {
+        document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+            const circle = btn.querySelector('.theme-toggle-circle');
+            const stars = btn.querySelector('.theme-stars');
+            
+            if (!circle) return;
+
             if (theme === 'dark') {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
+                // Dark mode: slide circle right, show moon, dark blue bg, show stars
+                btn.style.background = 'linear-gradient(135deg, #1e3a5f, #312e81)';
+                circle.style.left = '27px';
+                circle.style.background = '#e2e8f0';
+                circle.style.boxShadow = '0 0 8px rgba(99, 102, 241, 0.5)';
+                circle.textContent = '🌙';
+                if (stars) stars.style.opacity = '1';
             } else {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
+                // Light mode: slide circle left, show sun, warm bg, hide stars
+                btn.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                circle.style.left = '3px';
+                circle.style.background = '#ffffff';
+                circle.style.boxShadow = '0 1px 4px rgba(0,0,0,0.2)';
+                circle.textContent = '☀️';
+                if (stars) stars.style.opacity = '0';
             }
         });
     };
     
-    showActiveTheme(getPreferredTheme());
+    updateToggleVisual(getPreferredTheme());
     
     document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -44,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             setStoredTheme(newTheme);
             setTheme(newTheme);
-            showActiveTheme(newTheme);
+            updateToggleVisual(newTheme);
         });
     });
 });

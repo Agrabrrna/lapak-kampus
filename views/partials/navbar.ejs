@@ -40,11 +40,23 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
                 
                 <!-- Theme Toggle -->
-                <li class="nav-item">
-                    <button class="btn btn-link nav-link theme-toggle-btn d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 w-100 text-start text-lg-center text-decoration-none rounded-3 text-dark fw-medium" title="Toggle Dark Mode">
-                        <i class="fas fa-moon text-muted fs-5" style="width: 24px; text-align: center;"></i>
-                        <span class="d-lg-none">Ubah Tema</span>
+                <li class="nav-item d-flex align-items-center">
+                    <button class="theme-toggle-btn border-0 position-relative d-flex align-items-center justify-content-center" title="Toggle Dark Mode" style="width: 52px; height: 28px; border-radius: 14px; background: linear-gradient(135deg, #fbbf24, #f59e0b); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; padding: 0; outline: none;">
+                        <span class="theme-toggle-track" style="position: absolute; inset: 0; border-radius: 14px; overflow: hidden;">
+                            <!-- Stars (visible in dark mode) -->
+                            <span class="theme-stars" style="position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease;">
+                                <span style="position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 6px; left: 10px;"></span>
+                                <span style="position: absolute; width: 1.5px; height: 1.5px; background: #fff; border-radius: 50%; top: 14px; left: 18px;"></span>
+                                <span style="position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; top: 8px; left: 32px;"></span>
+                                <span style="position: absolute; width: 1px; height: 1px; background: #fff; border-radius: 50%; top: 18px; left: 38px;"></span>
+                            </span>
+                        </span>
+                        <!-- Toggle Circle -->
+                        <span class="theme-toggle-circle" style="position: absolute; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                            ☀️
+                        </span>
                     </button>
+                    <span class="d-lg-none ms-3 fw-medium text-dark theme-toggle-label">Ubah Tema</span>
                 </li>
 
                 <% if (locals.user) { %>
