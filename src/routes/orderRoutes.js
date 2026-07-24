@@ -14,7 +14,7 @@ router.post('/checkout/:sellerId', requireAuth, requireRole(['PEMBELI']), orderC
 
 // Order Management Routes
 router.get('/orders/my-orders', requireAuth, requireRole(['PEMBELI']), orderController.buyerOrders);
-router.get('/orders/incoming', requireAuth, requireRole(['PENJUAL']), orderController.sellerOrders);
+router.get('/orders/incoming', requireAuth, requireRole(['PENJUAL', 'ADMIN']), orderController.sellerOrders);
 
 // Order Status Update (Shared)
 router.post('/orders/:orderId/status', requireAuth, orderController.updateOrderStatus);

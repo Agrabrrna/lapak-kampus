@@ -16,28 +16,28 @@ const productValidationRules = [
 ];
 
 // Product CRUD routes for PENJUAL
-router.get('/seller/products', requireAuth, requireRole(['PENJUAL']), productController.getMyProducts);
+router.get('/seller/products', requireAuth, requireRole(['PENJUAL', 'ADMIN']), productController.getMyProducts);
 
-router.get('/seller/products/add', requireAuth, requireRole(['PENJUAL']), productController.getAddProduct);
+router.get('/seller/products/add', requireAuth, requireRole(['PENJUAL', 'ADMIN']), productController.getAddProduct);
 router.post(
   '/seller/products/add',
   requireAuth,
-  requireRole(['PENJUAL']),
+  requireRole(['PENJUAL', 'ADMIN']),
   upload.array('images', 5), // allow up to 5 images
   productValidationRules,
   productController.postAddProduct
 );
 
-router.get('/seller/products/edit/:id', requireAuth, requireRole(['PENJUAL']), productController.getEditProduct);
+router.get('/seller/products/edit/:id', requireAuth, requireRole(['PENJUAL', 'ADMIN']), productController.getEditProduct);
 router.post(
   '/seller/products/edit/:id',
   requireAuth,
-  requireRole(['PENJUAL']),
+  requireRole(['PENJUAL', 'ADMIN']),
   upload.array('images', 5),
   productValidationRules,
   productController.postEditProduct
 );
 
-router.post('/seller/products/delete/:id', requireAuth, requireRole(['PENJUAL']), productController.postDeleteProduct);
+router.post('/seller/products/delete/:id', requireAuth, requireRole(['PENJUAL', 'ADMIN']), productController.postDeleteProduct);
 
 module.exports = router;
