@@ -38,8 +38,13 @@ const getInbox = async (req, res) => {
           otherUser,
           product: chat.productId ? chat.product : null,
           lastMessage: chat.message,
-          lastMessageTime: chat.createdAt
+          lastMessageTime: chat.createdAt,
+          unreadCount: 0
         };
+      }
+      // Count unread messages sent TO current user
+      if (chat.receiverId === userId && !chat.isRead) {
+        threadsMap[threadKey].unreadCount++;
       }
     });
 
@@ -114,6 +119,17 @@ const getChatRoom = async (req, res) => {
         sender: { select: { id: true, name: true } }
       },
       orderBy: { createdAt: 'asc' }
+    });
+
+    // Mark all unread messages from other user as read
+    await prisma.chat.updateMany({
+      where: {
+        senderId: otherUserId,
+        receiverId: userId,
+        productId,
+        isRead: false
+      },
+      data: { isRead: true }
     });
 
     res.render('user/chat-room', {

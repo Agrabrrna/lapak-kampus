@@ -151,6 +151,7 @@ model Chat {
   receiverId String
   productId  String?
   message    String   @db.Text
+  isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
 
   sender   User     @relation("SentChats", fields: [senderId], references: [id])
