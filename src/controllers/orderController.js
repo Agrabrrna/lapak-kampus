@@ -335,7 +335,7 @@ exports.updateOrderStatus = async (req, res) => {
       } else if (newStatus === 'SELESAI' && order.status === 'DIPROSES') {
         allowed = true; // Buyer can mark completed if processing
       }
-    } else if (role === 'PENJUAL' && order.sellerId === userId) {
+    } else if ((role === 'PENJUAL' || role === 'ADMIN') && order.sellerId === userId) {
       if (newStatus === 'DIPROSES' && order.status === 'PENDING') {
         allowed = true; // Seller can accept
       } else if (newStatus === 'DIBATALKAN' && (order.status === 'PENDING' || order.status === 'DIPROSES')) {
