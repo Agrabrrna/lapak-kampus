@@ -140,7 +140,7 @@ const getProductDetail = async (req, res) => {
       }
 
       // Check if user has completed order for this product
-      if (req.session.user.role === 'PEMBELI') {
+      if (req.session.user.role === 'PEMBELI' || req.session.user.role === 'ADMIN') {
         const completedOrder = await prisma.order.findFirst({
           where: {
             buyerId: req.session.userId,

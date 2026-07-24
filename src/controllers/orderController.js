@@ -329,7 +329,7 @@ exports.updateOrderStatus = async (req, res) => {
     // Validate authorization and valid transitions
     let allowed = false;
 
-    if (role === 'PEMBELI' && order.buyerId === userId) {
+    if ((role === 'PEMBELI' || role === 'ADMIN') && order.buyerId === userId) {
       if (newStatus === 'DIBATALKAN' && order.status === 'PENDING') {
         allowed = true; // Buyer can cancel if pending
       } else if (newStatus === 'SELESAI' && order.status === 'DIPROSES') {

@@ -8,6 +8,6 @@ router.get('/products', catalogController.getCatalog);
 router.get('/products/:id', catalogController.getProductDetail);
 
 // Product Review Route
-router.post('/products/:id/review', requireAuth, requireRole(['PEMBELI']), catalogController.postReview);
+router.post('/products/:id/review', requireAuth, requireRole(['PEMBELI', 'ADMIN']), catalogController.postReview);
 
 module.exports = router;
