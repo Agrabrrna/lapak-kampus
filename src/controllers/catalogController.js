@@ -1,4 +1,5 @@
 const prisma = require('../services/db');
+const { uploadStream } = require('../services/cloudinary');
 
 const getCatalog = async (req, res) => {
   const q = req.query.q || '';
@@ -112,6 +113,13 @@ const getProductDetail = async (req, res) => {
           include: {
             user: {
               select: { name: true }
+            },
+            media: true,
+            reply: {
+              include: {
+                user: { select: { name: true } },
+                media: true
+              }
             }
           },
           orderBy: { createdAt: 'desc' }
@@ -199,7 +207,7 @@ const postReview = async (req, res) => {
     }
 
     // Create review
-    await prisma.review.create({
+    const review = await prisma.review.create({
       data: {
         productId: id,
         userId: req.session.userId,
@@ -207,6 +215,21 @@ const postReview = async (req, res) => {
         comment: comment || null
       }
     });
+
+    if (req.files && req.files.length > 0) {
+      const mediaPromises = req.files.map(async (file) => {
+        const uploadResult = await uploadStream(file.buffer, 'kampuslapak/reviews', 'auto');
+        const mediaType = file.mimetype.startsWith('video') ? 'video' : 'image';
+        return prisma.reviewMedia.create({
+          data: {
+            reviewId: review.id,
+            mediaPath: uploadResult.secure_url,
+            mediaType: mediaType
+          }
+        });
+      });
+      await Promise.all(mediaPromises);
+    }
 
     req.flash('success_msg', 'Terima kasih atas ulasan Anda!');
     res.redirect(req.get('Referrer') || '/');
@@ -218,8 +241,62 @@ const postReview = async (req, res) => {
   }
 };
 
+const postReviewReply = async (req, res) => {
+  const { id, reviewId } = req.params;
+  const { comment } = req.body;
+
+  try {
+    // Ensure the user is the seller of the product
+    const product = await prisma.product.findUnique({ where: { id: id } });
+    if (!product || product.userId !== req.session.userId) {
+      req.flash('error_msg', 'Anda tidak berhak membalas ulasan ini.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    const existingReply = await prisma.reviewReply.findUnique({
+      where: { reviewId: reviewId }
+    });
+
+    if (existingReply) {
+      req.flash('error_msg', 'Anda sudah membalas ulasan ini.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    const reply = await prisma.reviewReply.create({
+      data: {
+        reviewId: reviewId,
+        userId: req.session.userId,
+        comment: comment || null
+      }
+    });
+
+    if (req.files && req.files.length > 0) {
+      const mediaPromises = req.files.map(async (file) => {
+        const uploadResult = await uploadStream(file.buffer, 'kampuslapak/reviews', 'auto');
+        const mediaType = file.mimetype.startsWith('video') ? 'video' : 'image';
+        return prisma.reviewReplyMedia.create({
+          data: {
+            replyId: reply.id,
+            mediaPath: uploadResult.secure_url,
+            mediaType: mediaType
+          }
+        });
+      });
+      await Promise.all(mediaPromises);
+    }
+
+    req.flash('success_msg', 'Balasan berhasil dikirim!');
+    res.redirect(req.get('Referrer') || '/');
+  } catch (err) {
+    console.error(err);
+    req.flash('error_msg', 'Terjadi kesalahan saat membalas ulasan.');
+    res.redirect(req.get('Referrer') || '/');
+  }
+};
+
 module.exports = {
   getCatalog,
   getProductDetail,
-  postReview
+  postReview,
+  postReviewReply
 };

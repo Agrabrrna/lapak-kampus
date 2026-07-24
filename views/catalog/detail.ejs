@@ -214,7 +214,7 @@
                     <% if (user && user.role === 'PEMBELI' && !hasReviewed) { %>
                         <div class="bg-light p-4 rounded-4 mb-5 border">
                             <h6 class="fw-bold text-dark mb-3">Bagikan Pengalaman Anda</h6>
-                            <form action="/products/<%= product.id %>/review" method="POST">
+                            <form action="/products/<%= product.id %>/review" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <div class="mb-3">
                                     <label class="form-label text-muted">Beri Rating</label>
@@ -229,6 +229,11 @@
                                 <div class="mb-4">
                                     <label class="form-label text-muted">Tulis Komentar (Opsional)</label>
                                     <textarea name="comment" class="form-control" rows="3" placeholder="Ceritakan kepuasan Anda terhadap barang ini..."></textarea>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted">Foto/Video (Maksimal 3 file, opsional)</label>
+                                    <input type="file" name="media" class="form-control" multiple accept="image/jpeg,image/png,image/jpg,video/mp4,video/webm">
+                                    <small class="text-muted">Format yang didukung: JPG, PNG, MP4, WEBM. Maks ukuran: 20MB/file.</small>
                                 </div>
                                 <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm rounded-pill">Kirim Ulasan</button>
                             </form>
@@ -254,7 +259,81 @@
                                             <% for(let i=0; i<review.rating; i++) { %><i class="fas fa-star"></i><% } %>
                                             <% for(let i=0; i<(5-review.rating); i++) { %><i class="far fa-star"></i><% } %>
                                         </div>
-                                        <p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;"><%= review.comment || 'Pembeli tidak meninggalkan komentar teks.' %></p>
+                                        <p class="mb-3 text-muted" style="font-size: 0.95rem; line-height: 1.6;"><%= review.comment || 'Pembeli tidak meninggalkan komentar teks.' %></p>
+                                        
+                                        <% if (review.media && review.media.length > 0) { %>
+                                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                                <% review.media.forEach(m => { %>
+                                                    <% if (m.mediaType === 'image') { %>
+                                                        <a href="<%= m.mediaPath %>" target="_blank">
+                                                            <img src="<%= m.mediaPath %>" alt="Review Media" class="rounded border" style="width: 80px; height: 80px; object-fit: cover;">
+                                                        </a>
+                                                    <% } else { %>
+                                                        <a href="<%= m.mediaPath %>" target="_blank" class="position-relative d-inline-block">
+                                                            <video src="<%= m.mediaPath %>" class="rounded border bg-dark" style="width: 80px; height: 80px; object-fit: cover;"></video>
+                                                            <div class="position-absolute top-50 start-50 translate-middle text-white" style="pointer-events: none;">
+                                                                <i class="fas fa-play-circle fs-4"></i>
+                                                            </div>
+                                                        </a>
+                                                    <% } %>
+                                                <% }) %>
+                                            </div>
+                                        <% } %>
+
+                                        <% if (review.reply) { %>
+                                            <div class="bg-light p-3 rounded-3 mt-3 border-start border-4 border-primary">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-store text-primary me-2"></i>
+                                                        <span class="fw-bold text-dark" style="font-size: 0.9rem;">Balasan Penjual</span>
+                                                    </div>
+                                                    <span class="text-muted" style="font-size: 0.8rem;"><%= new Date(review.reply.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) %></span>
+                                                </div>
+                                                <p class="mb-2 text-muted" style="font-size: 0.9rem; line-height: 1.5;"><%= review.reply.comment || '' %></p>
+                                                
+                                                <% if (review.reply.media && review.reply.media.length > 0) { %>
+                                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                                        <% review.reply.media.forEach(rm => { %>
+                                                            <% if (rm.mediaType === 'image') { %>
+                                                                <a href="<%= rm.mediaPath %>" target="_blank">
+                                                                    <img src="<%= rm.mediaPath %>" alt="Reply Media" class="rounded border" style="width: 60px; height: 60px; object-fit: cover;">
+                                                                </a>
+                                                            <% } else { %>
+                                                                <a href="<%= rm.mediaPath %>" target="_blank" class="position-relative d-inline-block">
+                                                                    <video src="<%= rm.mediaPath %>" class="rounded border bg-dark" style="width: 60px; height: 60px; object-fit: cover;"></video>
+                                                                    <div class="position-absolute top-50 start-50 translate-middle text-white" style="pointer-events: none;">
+                                                                        <i class="fas fa-play-circle fs-5"></i>
+                                                                    </div>
+                                                                </a>
+                                                            <% } %>
+                                                        <% }) %>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                        <% } else if (user && user.id === product.userId) { %>
+                                            <div class="mt-3">
+                                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" type="button" data-bs-toggle="collapse" data-bs-target="#replyForm-<%= review.id %>" aria-expanded="false" aria-controls="replyForm-<%= review.id %>">
+                                                    <i class="fas fa-reply me-1"></i> Balas Ulasan
+                                                </button>
+                                                <div class="collapse mt-3" id="replyForm-<%= review.id %>">
+                                                    <div class="card card-body bg-light border-0">
+                                                        <form action="/products/<%= product.id %>/review/<%= review.id %>/reply" method="POST" enctype="multipart/form-data">
+                                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                            <div class="mb-2">
+                                                                <textarea name="comment" class="form-control form-control-sm" rows="2" placeholder="Tulis balasan Anda..." required></textarea>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-muted small mb-1">Lampiran Foto/Video (Opsional)</label>
+                                                                <input type="file" name="media" class="form-control form-control-sm" multiple accept="image/jpeg,image/png,image/jpg,video/mp4,video/webm">
+                                                            </div>
+                                                            <div class="text-end">
+                                                                <button type="submit" class="btn btn-sm btn-primary fw-bold px-3">Kirim Balasan</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } %>
                                     </div>
                                 </div>
                             <% }) %>

@@ -48,6 +48,7 @@ model User {
   buyerOrders   Order[]        @relation("BuyerOrders")
   sellerOrders  Order[]        @relation("SellerOrders")
   reviews       Review[]
+  reviewReplies ReviewReply[]
   wishlists     Wishlist[]
   sentChats     Chat[]         @relation("SentChats")
   receivedChats Chat[]         @relation("ReceivedChats")
@@ -133,6 +134,40 @@ model Review {
 
   product Product @relation(fields: [productId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
+  media   ReviewMedia[]
+  reply   ReviewReply?
+}
+
+model ReviewMedia {
+  id        String   @id @default(uuid())
+  reviewId  String
+  mediaPath String
+  mediaType String   // "image" or "video"
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model ReviewReply {
+  id        String   @id @default(uuid())
+  reviewId  String   @unique
+  userId    String
+  comment   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+  media  ReviewReplyMedia[]
+}
+
+model ReviewReplyMedia {
+  id        String   @id @default(uuid())
+  replyId   String
+  mediaPath String
+  mediaType String   // "image" or "video"
+  createdAt DateTime @default(now())
+
+  reply ReviewReply @relation(fields: [replyId], references: [id], onDelete: Cascade)
 }
 
 model Wishlist {

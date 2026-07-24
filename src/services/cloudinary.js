@@ -14,10 +14,10 @@ cloudinary.config({
  * @param {String} folder - Folder name in Cloudinary (e.g. 'kampuslapak/products')
  * @returns {Promise<Object>} - Cloudinary upload result
  */
-const uploadStream = (buffer, folder = 'kampuslapak') => {
+const uploadStream = (buffer, folder = 'kampuslapak', resourceType = 'auto') => {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder: folder },
+      { folder: folder, resource_type: resourceType },
       (error, result) => {
         if (result) {
           resolve(result);
