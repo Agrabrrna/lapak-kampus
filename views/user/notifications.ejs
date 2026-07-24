@@ -93,11 +93,11 @@
                                 
                                 <!-- Content -->
                                 <div class="flex-grow-1">
-                                    <a href="/notifications/<%= notif.id %>/click" class="text-decoration-none stretched-link">
+                                    <a href="<%= targetUrl %>" class="text-decoration-none stretched-link" onclick="markAsReadAndGo(event, '<%= notif.id %>', '<%= targetUrl %>')">
                                         <h6 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
                                             <%= notif.title %>
                                             <% if (!notif.isRead) { %>
-                                                <span class="badge bg-danger rounded-pill" style="font-size: 0.6rem;">Baru</span>
+                                                <span class="badge bg-danger rounded-pill notif-badge" style="font-size: 0.6rem;">Baru</span>
                                             <% } %>
                                         </h6>
                                     </a>
@@ -124,5 +124,35 @@
     
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/theme-toggle.js"></script>
+    <script>
+        async function markAsReadAndGo(event, id, url) {
+            event.preventDefault();
+            
+            // Optimistically update UI
+            const card = event.currentTarget.closest('.notif-card');
+            if (card) {
+                card.classList.remove('notif-unread');
+                card.classList.add('notif-read');
+                const badge = card.querySelector('.notif-badge');
+                if (badge) badge.remove();
+                
+                const form = card.querySelector('form');
+                if (form) form.style.display = 'none';
+            }
+
+            // Send background request
+            try {
+                await fetch(`/notifications/${id}/read`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: '_csrf=<%= locals.csrfToken %>'
+                });
+            } catch (e) {
+                console.error(e);
+            }
+            
+            window.location.href = url;
+        }
+    </script>
 </body>
 </html>
