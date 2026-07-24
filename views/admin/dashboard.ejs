@@ -26,28 +26,34 @@
 
         <div class="row">
             <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-users"></i> Total Pengguna</h5>
-                        <h2 class="fw-bold"><%= totalUsers %></h2>
+                <a href="/admin/users" class="text-decoration-none">
+                    <div class="card text-white bg-primary mb-3 shadow-sm border-0" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-users"></i> Total Pengguna</h5>
+                            <h2 class="fw-bold"><%= totalUsers %></h2>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-success mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-shopping-cart"></i> Total Pesanan</h5>
-                        <h2 class="fw-bold"><%= totalOrders %></h2>
+                <a href="/admin/orders" class="text-decoration-none">
+                    <div class="card text-white bg-success mb-3 shadow-sm border-0" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-shopping-cart"></i> Total Pesanan</h5>
+                            <h2 class="fw-bold"><%= totalOrders %></h2>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-md-4">
-                <div class="card text-white bg-warning mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-tags"></i> Total Kategori</h5>
-                        <h2 class="fw-bold"><%= totalCategories %></h2>
+                <a href="/admin/categories" class="text-decoration-none">
+                    <div class="card text-white bg-warning mb-3 shadow-sm border-0" style="transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tags"></i> Total Kategori</h5>
+                            <h2 class="fw-bold"><%= totalCategories %></h2>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
