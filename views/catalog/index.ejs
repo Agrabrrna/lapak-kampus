@@ -22,12 +22,9 @@
             border-top-right-radius: 12px;
             width: 100%;
         }
-        .filter-sidebar {
-            background-color: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-        }
     </style>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
@@ -57,13 +54,13 @@
                                 <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
                             <% } %>
                         </li>
-                        <li class="nav-item position-relative me-3">
-                            <li class="nav-item d-flex align-items-center me-2">
-                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
-                            <i class="fas fa-moon fs-5"></i>
-                        </button>
-                    </li>
-                    <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
+                        <li class="nav-item d-flex align-items-center me-3">
+                            <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
+                                <i class="fas fa-moon fs-5 text-muted"></i>
+                            </button>
+                        </li>
+                        <li class="nav-item position-relative me-3 d-flex align-items-center">
+                            <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
                                 🔔
                                 <% if (locals.unreadCount > 0) { %>
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
