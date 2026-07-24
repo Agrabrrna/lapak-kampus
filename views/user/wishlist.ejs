@@ -18,34 +18,7 @@
 </head>
 <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-
-                    <li class="nav-item d-flex align-items-center me-2">
-                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
-                            <i class="fas fa-moon fs-5"></i>
-                        </button>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <span class="text-white me-3 small">Halo, <%= user.name %></span>
-                    </li>
-                    <li class="nav-item">
-                        <form action="/auth/logout" method="POST" class="m-0">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <%- include('../partials/navbar') %>
 
     <!-- Main Content -->
     <div class="container mt-5 mb-5">

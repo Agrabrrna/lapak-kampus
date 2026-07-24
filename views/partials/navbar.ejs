@@ -1,0 +1,113 @@
+<% 
+  let homeLink = '/products';
+  if (locals.user) {
+    if (user.role === 'ADMIN') homeLink = '/admin/dashboard';
+    else if (user.role === 'PENJUAL') homeLink = '/seller/products';
+    else homeLink = '/user/dashboard';
+  }
+%>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold text-primary" href="<%= homeLink %>">KampusLapak</a>
+        
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler border-0 shadow-none px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse mt-3 mt-lg-0" id="navbarContent">
+            <!-- Left aligned (Desktop) / Top (Mobile) -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 rounded-3 text-dark fw-medium" href="/products">
+                        <i class="fas fa-store text-muted fs-5" style="width: 24px; text-align: center;"></i>
+                        <span>Katalog</span>
+                    </a>
+                </li>
+                <% if (locals.user) { %>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 rounded-3 text-dark fw-medium" href="<%= homeLink %>">
+                            <i class="fas fa-th-large text-muted fs-5" style="width: 24px; text-align: center;"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+
+            <!-- Right aligned (Desktop) / Bottom (Mobile) -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                
+                <!-- Theme Toggle -->
+                <li class="nav-item">
+                    <button class="btn btn-link nav-link theme-toggle-btn d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 w-100 text-start text-lg-center text-decoration-none rounded-3 text-dark fw-medium" title="Toggle Dark Mode">
+                        <i class="fas fa-moon text-muted fs-5" style="width: 24px; text-align: center;"></i>
+                        <span class="d-lg-none">Ubah Tema</span>
+                    </button>
+                </li>
+
+                <% if (locals.user) { %>
+                    <!-- Notifications -->
+                    <li class="nav-item">
+                        <a href="/notifications" class="nav-link d-flex align-items-center gap-3 px-3 px-lg-2 py-3 py-lg-2 position-relative text-decoration-none rounded-3 text-dark fw-medium">
+                            <div class="position-relative d-inline-block" style="width: 24px; text-align: center;">
+                                <i class="fas fa-bell text-muted fs-5"></i>
+                                <% if (locals.unreadCount > 0) { %>
+                                    <!-- Dot badge for desktop -->
+                                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle d-none d-lg-block">
+                                        <span class="visually-hidden">New alerts</span>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <span class="d-lg-none">Notifikasi</span>
+                            <% if (locals.unreadCount > 0) { %>
+                                <!-- Number badge for mobile -->
+                                <span class="badge rounded-pill bg-danger ms-auto d-lg-none px-2 py-1"><%= unreadCount %></span>
+                            <% } %>
+                        </a>
+                    </li>
+
+                    <!-- Mobile Divider -->
+                    <hr class="d-lg-none border-secondary opacity-10 mx-3 my-2">
+
+                    <!-- Desktop User Info -->
+                    <li class="nav-item d-none d-lg-block ms-lg-3 me-lg-3">
+                        <span class="text-muted small fw-bold">Halo, <%= user.name %></span>
+                    </li>
+                    
+                    <!-- Mobile User Info -->
+                    <li class="nav-item d-lg-none px-3 py-3 mb-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center shadow-sm" style="width: 48px; height: 48px;">
+                                <i class="fas fa-user fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1 fw-bold text-dark"><%= user.name %></h6>
+                                <small class="text-muted fw-bold badge bg-light border"><%= user.role %></small>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li class="nav-item px-3 px-lg-0 mt-2 mt-lg-0 mb-4 mb-lg-0">
+                        <form action="/auth/logout" method="POST" class="m-0">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="btn btn-danger w-100 rounded-pill px-4 py-3 py-lg-2 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="min-height: 44px;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Keluar</span>
+                            </button>
+                        </form>
+                    </li>
+                <% } else { %>
+                    <!-- Guest Links -->
+                    <li class="nav-item px-3 px-lg-2 py-2 py-lg-1 mt-3 mt-lg-0">
+                        <a class="btn btn-outline-primary w-100 rounded-pill py-2 py-lg-1 fw-bold" style="min-height: 44px;" href="/auth/login">Masuk</a>
+                    </li>
+                    <li class="nav-item px-3 px-lg-2 py-2 py-lg-1 mb-4 mb-lg-0">
+                        <a class="btn btn-primary w-100 rounded-pill fw-bold text-white shadow-sm py-2 py-lg-1" style="min-height: 44px;" href="/auth/register">Daftar</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>

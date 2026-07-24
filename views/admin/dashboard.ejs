@@ -12,37 +12,7 @@
 </head>
 <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/admin/dashboard">Admin Panel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/admin/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/users">Pengguna</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/categories">Kategori</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/admin/orders">Transaksi</a>
-                    </li>
-                </ul>
-                <div class="d-flex gap-2">
-                    <a href="/products" class="btn btn-outline-light btn-sm">Ke Toko</a>
-                    <form action="/auth/logout" method="POST" class="d-inline">
-                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken || '' %>">
-                        <button type="submit" class="btn btn-danger btn-sm">Logout</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <%- include('../partials/navbar') %>
 
     <div class="container mt-4">
         <h2 class="fw-bold mb-4">Dashboard Statistik</h2>

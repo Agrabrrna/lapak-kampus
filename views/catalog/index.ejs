@@ -31,63 +31,7 @@
 </head>
 <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="/products">KampusLapak</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/products">Katalog</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <% if (user) { %>
-                        <li class="nav-item">
-                            <% if (user.role === 'ADMIN') { %>
-                                <a class="btn btn-outline-light btn-sm me-2" href="/admin/dashboard">Dashboard</a>
-                            <% } else if (user.role === 'PENJUAL') { %>
-                                <a class="btn btn-outline-light btn-sm me-2" href="/seller/products">Panel Penjual</a>
-                            <% } else { %>
-                                <a class="btn btn-outline-light btn-sm me-2" href="/user/dashboard">Dashboard</a>
-                            <% } %>
-                        </li>
-                        <li class="nav-item d-flex align-items-center me-3">
-                            <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
-                                <i class="fas fa-moon fs-5 text-muted"></i>
-                            </button>
-                        </li>
-                        <li class="nav-item position-relative me-3 d-flex align-items-center">
-                            <a href="/notifications" class="text-white text-decoration-none" style="font-size: 1.2rem;">
-                                🔔
-                                <% if (locals.unreadCount > 0) { %>
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
-                                <% } %>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <span class="text-white me-3 small">Halo, <%= user.name %></span>
-                        </li>
-                        <li class="nav-item">
-                            <form action="/auth/logout" method="POST" class="m-0">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button type="submit" class="btn btn-danger btn-sm">Keluar</button>
-                            </form>
-                        </li>
-                    <% } else { %>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-light btn-sm me-2" href="/auth/login">Masuk</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-light btn-sm text-primary fw-bold" href="/auth/register">Daftar</a>
-                        </li>
-                    <% } %>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <%- include('../partials/navbar') %>
 
     <!-- Content -->
     <div class="container mt-4 mb-5">
