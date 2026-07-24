@@ -1,84 +1,128 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .notif-card {
+            transition: all 0.2s ease;
+            border-radius: 12px !important;
+            margin-bottom: 12px;
+            border: 1px solid var(--color-border);
+        }
+        .notif-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .notif-unread {
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+        }
+        .notif-read {
+            background: transparent;
+            opacity: 0.7;
+            border-left: 4px solid transparent;
+        }
+        .notif-read:hover {
+            opacity: 1;
+            background: var(--color-surface);
+        }
+        /* Override bg-light icon circle in dark mode for contrast */
+        [data-bs-theme="dark"] .notif-icon-circle {
+            background-color: rgba(255,255,255,0.05) !important;
+        }
+    </style>
 </head>
-
 <body class="bg-light">
     <!-- Navbar -->
     <%- include('../partials/navbar') %>
 
-    <div class="container mt-4">
+    <div class="container mt-5 mb-5" style="max-width: 800px;">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold mb-0">Notifikasi</h2>
-            <% if (locals.unreadCount> 0) { %>
-                <form action="/notifications/read-all" method="POST">
+            <h2 class="fw-bold mb-0 text-dark">🔔 Notifikasi</h2>
+            <% if (locals.unreadCount > 0) { %>
+                <form action="/notifications/read-all" method="POST" class="m-0">
                     <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">Tandai Semua Dibaca</button>
+                    <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold shadow-sm">
+                        <i class="fas fa-check-double me-1"></i> Tandai Semua Dibaca
+                    </button>
                 </form>
-                <% } %>
+            <% } %>
         </div>
 
         <% if (messages && messages.success_msg) { %>
-            <div class="alert alert-success">
-                <%= messages.success_msg %>
-            </div>
-            <% } %>
+            <div class="alert alert-success border-0 shadow-sm rounded-3"><%= messages.success_msg %></div>
+        <% } %>
 
-                <div class="card border-0 shadow-sm">
-                    <div class="list-group list-group-flush">
-                        <% if (notifications.length===0) { %>
-                            <div class="list-group-item p-4 text-center text-muted">
-                                Belum ada notifikasi.
-                            </div>
-                            <% } else { %>
-                                <% notifications.forEach(notif=> {
-                                    let targetUrl = '#';
-                                    if (notif.title === 'Pesan Baru') targetUrl = '/chat/inbox';
-                                    else if (notif.title === 'Pesanan Baru Masuk') targetUrl =
-                                    '/orders/incoming-orders';
-                                    else if (notif.title === 'Pembaruan Status Pesanan') targetUrl =
-                                    '/orders/my-orders';
-                                    %>
-                                    <div
-                                        class="list-group-item p-3 <%= notif.isRead ? 'bg-white' : 'bg-light border-start border-4 border-primary' %> position-relative">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <div>
-                                                <a href="<%= targetUrl %>" class="text-decoration-none stretched-link">
-                                                    <h6
-                                                        class="fw-bold mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>">
-                                                        <%= notif.title %>
-                                                    </h6>
-                                                </a>
-                                                <p class="mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>">
-                                                    <%= notif.message %>
-                                                </p>
-                                                <small class="text-muted">
-                                                    <%= new Date(notif.createdAt).toLocaleString('id-ID') %>
-                                                </small>
-                                            </div>
-                                            <% if (!notif.isRead) { %>
-                                                <form action="/notifications/<%= notif.id %>/read" method="POST"
-                                                    style="position: relative; z-index: 2;">
-                                                    <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary">Tandai
-                                                        Dibaca</button>
-                                                </form>
-                                                <% } %>
-                                        </div>
-                                    </div>
-                                    <% }) %>
-                                        <% } %>
-                    </div>
+        <div class="mt-2">
+            <% if (notifications.length === 0) { %>
+                <div class="card p-5 text-center border-0 shadow-sm">
+                    <i class="fas fa-bell-slash text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+                    <h5 class="fw-bold text-dark">Belum ada notifikasi</h5>
+                    <p class="text-muted mb-0">Anda akan mendapat pemberitahuan saat ada aktivitas baru.</p>
                 </div>
+            <% } else { %>
+                <% notifications.forEach(notif => { 
+                    let targetUrl = '#';
+                    let iconClass = 'fas fa-info-circle text-primary';
+                    if (notif.title === 'Pesan Baru') {
+                        targetUrl = '/chat/inbox';
+                        iconClass = 'fas fa-comment-dots text-success';
+                    }
+                    else if (notif.title === 'Pesanan Baru Masuk') {
+                        targetUrl = '/orders/incoming-orders';
+                        iconClass = 'fas fa-box-open text-warning';
+                    }
+                    else if (notif.title === 'Pembaruan Status Pesanan') {
+                        targetUrl = '/orders/my-orders';
+                        iconClass = 'fas fa-truck text-info';
+                    }
+                %>
+                    <div class="card notif-card <%= notif.isRead ? 'notif-read' : 'notif-unread' %>">
+                        <div class="card-body p-4 position-relative">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <!-- Icon -->
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-light shadow-sm notif-icon-circle" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    <i class="<%= iconClass %> fs-5"></i>
+                                </div>
+                                
+                                <!-- Content -->
+                                <div class="flex-grow-1">
+                                    <a href="<%= targetUrl %>" class="text-decoration-none stretched-link">
+                                        <h6 class="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                                            <%= notif.title %>
+                                            <% if (!notif.isRead) { %>
+                                                <span class="badge bg-danger rounded-pill" style="font-size: 0.6rem;">Baru</span>
+                                            <% } %>
+                                        </h6>
+                                    </a>
+                                    <p class="mb-2 text-muted" style="font-size: 0.95rem;"><%= notif.message %></p>
+                                    <small class="text-muted fw-medium"><i class="far fa-clock me-1"></i> <%= new Date(notif.createdAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) %></small>
+                                </div>
+                                
+                                <!-- Action -->
+                                <% if (!notif.isRead) { %>
+                                    <form action="/notifications/<%= notif.id %>/read" method="POST" style="position: relative; z-index: 2;">
+                                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary border fw-bold shadow-sm rounded-pill px-3" title="Tandai Dibaca">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
     </div>
+    
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/theme-toggle.js"></script>
 </body>
-
 </html>
