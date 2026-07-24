@@ -25,6 +25,13 @@ enum OrderStatus {
   DIBATALKAN
 }
 
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  EXPIRED
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -101,6 +108,7 @@ model Order {
   buyer        User          @relation("BuyerOrders", fields: [buyerId], references: [id])
   seller       User          @relation("SellerOrders", fields: [sellerId], references: [id])
   orderDetails OrderDetail[]
+  payment      Payment?
 }
 
 model OrderDetail {
@@ -159,4 +167,19 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id                    String        @id @default(uuid())
+  orderId               String        @unique
+  method                String?
+  status                PaymentStatus @default(PENDING)
+  midtransOrderId       String?       @unique
+  midtransTransactionId String?       @unique
+  amount                Decimal       @db.Decimal(10, 2)
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
 }
