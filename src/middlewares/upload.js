@@ -16,10 +16,10 @@ const fileFilter = (req, file, cb) => {
   cb(new Error('Tipe file tidak didukung! Hanya diperbolehkan format JPG, JPEG, atau PNG.'));
 };
 
-// Multer middleware limit to max 5 files, 2MB each
+// Multer middleware limit to max 5 files, 10MB each
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: fileFilter
 });
 
