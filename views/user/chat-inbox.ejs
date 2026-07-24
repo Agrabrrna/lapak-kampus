@@ -66,5 +66,18 @@
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/theme-toggle.js"></script>
+    <script>
+        document.querySelectorAll('.thread-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Instantly hide the unread badge before navigating
+                const badge = this.querySelector('.bg-danger');
+                if (badge) {
+                    badge.style.transition = 'opacity 0.2s ease';
+                    badge.style.opacity = '0';
+                    setTimeout(() => badge.remove(), 200);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
