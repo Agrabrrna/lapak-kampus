@@ -70,6 +70,59 @@ exports.addToCart = async (req, res) => {
   }
 };
 
+exports.buyNow = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const qty = parseInt(req.body.quantity) || 1;
+
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { user: true, images: true }
+    });
+
+    if (!product) {
+      req.flash('error_msg', 'Produk tidak ditemukan.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    if (product.stock < qty) {
+      req.flash('error_msg', 'Stok produk tidak mencukupi.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    if (product.userId === req.session.userId) {
+      req.flash('error_msg', 'Anda tidak bisa membeli produk Anda sendiri.');
+      return res.redirect(req.get('Referrer') || '/');
+    }
+
+    const sellerId = product.userId;
+
+    // Clear any existing cart for this seller and set only this product
+    if (!req.session.cart) {
+      req.session.cart = {};
+    }
+
+    const primaryImg = product.images.find(img => img.isPrimary) || product.images[0];
+    req.session.cart[sellerId] = {
+      sellerName: product.user.name,
+      items: [{
+        productId: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        quantity: qty,
+        image: primaryImg ? primaryImg.imagePath : null
+      }]
+    };
+
+    // Redirect directly to checkout
+    res.redirect(`/checkout/${sellerId}`);
+  } catch (error) {
+    console.error('Error in buyNow:', error);
+    req.flash('error_msg', 'Terjadi kesalahan pada server.');
+    res.redirect(req.get('Referrer') || '/');
+  }
+};
+
 exports.viewCart = (req, res) => {
   const cart = req.session.cart || {};
   res.render('order/cart', {

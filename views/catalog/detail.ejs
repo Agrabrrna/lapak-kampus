@@ -105,14 +105,25 @@
                     <!-- Action Buttons -->
                     <div class="mt-auto pt-4 border-top">
                         <% if (user) { %>
-                            <% if (user.role === 'PEMBELI') { %>
+                            <% if (user.role === 'PEMBELI' || user.role === 'ADMIN') { %>
                                 <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="d-flex gap-2">
+                                            <form action="/cart/add/<%= product.id %>" method="POST" class="d-flex gap-2 flex-grow-1" id="cartForm">
+                                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                <input type="number" name="quantity" id="qtyInput" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" style="width: 80px;" required>
+                                                <button type="submit" class="btn btn-primary flex-grow-1 fw-bold fs-6 shadow">
+                                                    <i class="fas fa-shopping-cart me-2"></i> Masukkan Keranjang
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                     <div class="col-md-7">
-                                        <form action="/cart/add/<%= product.id %>" method="POST" class="d-flex gap-2 h-100">
+                                        <form action="/buy-now/<%= product.id %>" method="POST">
                                             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                            <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="<%= product.stock %>" style="width: 80px;" required>
-                                            <button type="submit" class="btn btn-primary flex-grow-1 fw-bold fs-6 shadow">
-                                                <i class="fas fa-shopping-cart me-2"></i> Masukkan Keranjang
+                                            <input type="hidden" name="quantity" id="buyNowQty" value="1">
+                                            <button type="submit" class="btn btn-warning w-100 fw-bold fs-6 shadow py-2 text-dark">
+                                                <i class="fas fa-bolt me-2"></i> Beli Langsung
                                             </button>
                                         </form>
                                     </div>
@@ -271,6 +282,19 @@
             const thumbnails = document.querySelectorAll('.thumbnail-img');
             thumbnails.forEach(thumb => thumb.classList.remove('active'));
             element.classList.add('active');
+        }
+    </script>
+    <script>
+        // Sync quantity input with Buy Now form
+        const qtyInput = document.getElementById('qtyInput');
+        const buyNowQty = document.getElementById('buyNowQty');
+        if (qtyInput && buyNowQty) {
+            qtyInput.addEventListener('change', () => {
+                buyNowQty.value = qtyInput.value;
+            });
+            qtyInput.addEventListener('input', () => {
+                buyNowQty.value = qtyInput.value;
+            });
         }
     </script>
     <script src="/js/bootstrap.bundle.min.js"></script>

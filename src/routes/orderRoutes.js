@@ -5,6 +5,7 @@ const { requireAuth, requireRole } = require('../middlewares/auth');
 
 // Cart Routes (Buyer Only)
 router.post('/cart/add/:productId', requireAuth, requireRole(['PEMBELI', 'ADMIN']), orderController.addToCart);
+router.post('/buy-now/:productId', requireAuth, requireRole(['PEMBELI', 'ADMIN']), orderController.buyNow);
 router.get('/cart', requireAuth, requireRole(['PEMBELI', 'ADMIN']), orderController.viewCart);
 router.post('/cart/remove/:sellerId/:productId', requireAuth, requireRole(['PEMBELI', 'ADMIN']), orderController.removeFromCart);
 
