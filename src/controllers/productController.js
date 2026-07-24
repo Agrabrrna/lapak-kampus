@@ -299,6 +299,16 @@ const postDeleteProduct = async (req, res) => {
       where: { productId: id }
     });
 
+    // Clear product from wishlists and reviews
+    await prisma.wishlist.deleteMany({ where: { productId: id } });
+    await prisma.review.deleteMany({ where: { productId: id } });
+    
+    // Detach product from chats
+    await prisma.chat.updateMany({
+      where: { productId: id },
+      data: { productId: null }
+    });
+
     // Delete product record
     await prisma.product.delete({
       where: { id }
@@ -318,7 +328,28 @@ const postDeleteProduct = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Terjadi kesalahan saat menghapus produk.');
+    
+    let errorMessage = 'Terjadi kesalahan saat menghapus produk.';
+    // Prisma Foreign Key constraint error (P2003)
+    if (err.code === 'P2003') {
+      errorMessage = 'Produk tidak dapat dihapus karena sudah terkait dengan riwayat pesanan pembeli. Jika produk ini tidak dijual lagi, pertimbangkan untuk mengubah stok menjadi 0.';
+    }
+
+    try {
+      const products = await prisma.product.findMany({
+        where: { userId: req.session.userId },
+        include: { category: true, images: true },
+        orderBy: { createdAt: 'desc' }
+      });
+      res.render('seller/products', {
+        title: 'Produk Saya - KampusLapak',
+        products,
+        success: null,
+        error: errorMessage
+      });
+    } catch (fallbackErr) {
+      res.status(500).send(errorMessage);
+    }
   }
 };
 
