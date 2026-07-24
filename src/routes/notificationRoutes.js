@@ -7,6 +7,7 @@ router.use(requireAuth);
 
 router.get('/notifications', notificationController.getNotifications);
 router.post('/notifications/:id/read', notificationController.postMarkAsRead);
+router.get('/notifications/:id/click', notificationController.getNotificationClick);
 router.post('/notifications/read-all', notificationController.postMarkAllAsRead);
 
 module.exports = router;

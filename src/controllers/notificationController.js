@@ -58,3 +58,35 @@ exports.postMarkAllAsRead = async (req, res) => {
     res.redirect('back');
   }
 };
+
+exports.getNotificationClick = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const notification = await prisma.notification.findUnique({
+      where: { id }
+    });
+
+    if (notification && notification.userId === req.session.userId) {
+      if (!notification.isRead) {
+        await prisma.notification.update({
+          where: { id },
+          data: { isRead: true }
+        });
+      }
+      
+      let targetUrl = '/';
+      if (notification.title === 'Pesan Baru') {
+          targetUrl = '/chat/inbox';
+      } else if (notification.title === 'Pesanan Baru Masuk') {
+          targetUrl = '/orders/incoming-orders';
+      } else if (notification.title === 'Pembaruan Status Pesanan') {
+          targetUrl = '/orders/my-orders';
+      }
+      return res.redirect(targetUrl);
+    }
+    res.redirect('/');
+  } catch (error) {
+    console.error('Error clicking notification:', error);
+    res.redirect('/');
+  }
+};
