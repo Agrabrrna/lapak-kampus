@@ -139,26 +139,14 @@ const getProductDetail = async (req, res) => {
         inWishlist = true;
       }
 
-      // Check if user has completed order for this product
+      // Check if user has already reviewed
       if (req.session.user.role === 'PEMBELI' || req.session.user.role === 'ADMIN') {
-        const completedOrder = await prisma.order.findFirst({
+        const existingReview = await prisma.review.findFirst({
           where: {
-            buyerId: req.session.userId,
-            status: 'SELESAI',
-            orderDetails: {
-              some: {
-                productId: id
-              }
-            }
+            productId: id,
+            userId: req.session.userId
           }
         });
-
-        if (completedOrder) {
-          hasCompletedOrder = true;
-        }
-
-        // Check if user has already reviewed
-        const existingReview = product.reviews.find(r => r.userId === req.session.userId);
         if (existingReview) {
           hasReviewed = true;
         }
@@ -177,7 +165,6 @@ const getProductDetail = async (req, res) => {
       product,
       inWishlist,
       averageRating,
-      hasCompletedOrder,
       hasReviewed
     });
 
@@ -195,24 +182,6 @@ const postReview = async (req, res) => {
     const ratingInt = parseInt(rating);
     if (isNaN(ratingInt) || ratingInt < 1 || ratingInt > 5) {
       req.flash('error_msg', 'Rating harus antara 1 sampai 5.');
-      return res.redirect(req.get('Referrer') || '/');
-    }
-
-    // Verify user has completed order
-    const completedOrder = await prisma.order.findFirst({
-      where: {
-        buyerId: req.session.userId,
-        status: 'SELESAI',
-        orderDetails: {
-          some: {
-            productId: id
-          }
-        }
-      }
-    });
-
-    if (!completedOrder) {
-      req.flash('error_msg', 'Anda tidak bisa mereview produk ini sebelum pesanan selesai.');
       return res.redirect(req.get('Referrer') || '/');
     }
 
