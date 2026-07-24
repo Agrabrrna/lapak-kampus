@@ -104,7 +104,8 @@ const getProductDetail = async (req, res) => {
           select: {
             name: true,
             email: true,
-            phone: true
+            phone: true,
+            address: true
           }
         },
         reviews: {
