@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body class="bg-light">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
             <div class="d-flex gap-3 align-items-center">
                 <a href="/products" class="btn btn-outline-light btn-sm">Ke Katalog</a>
-                <li class="nav-item d-flex align-items-center me-2">
-                        <button class="btn btn-link nav-link theme-toggle-btn p-2" title="Toggle Dark Mode">
-                            <i class="fas fa-moon fs-5"></i>
-                        </button>
-                    </li>
-                    <a href="/notifications" class="text-white text-decoration-none position-relative">
+                <a href="/notifications" class="text-white text-decoration-none position-relative">
                     🔔
-                    <% if (locals.unreadCount > 0) { %>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;"><%= unreadCount %></span>
-                    <% } %>
+                    <% if (locals.unreadCount> 0) { %>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            style="font-size: 0.6rem;">
+                            <%= unreadCount %>
+                        </span>
+                        <% } %>
                 </a>
             </div>
         </div>
@@ -35,54 +34,67 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold mb-0">Notifikasi</h2>
-            <% if (locals.unreadCount > 0) { %>
+            <% if (locals.unreadCount> 0) { %>
                 <form action="/notifications/read-all" method="POST">
                     <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
                     <button type="submit" class="btn btn-outline-primary btn-sm">Tandai Semua Dibaca</button>
                 </form>
-            <% } %>
+                <% } %>
         </div>
 
         <% if (messages && messages.success_msg) { %>
-            <div class="alert alert-success"><%= messages.success_msg %></div>
-        <% } %>
-
-        <div class="card border-0 shadow-sm">
-            <div class="list-group list-group-flush">
-                <% if (notifications.length === 0) { %>
-                    <div class="list-group-item p-4 text-center text-muted">
-                        Belum ada notifikasi.
-                    </div>
-                <% } else { %>
-                    <% notifications.forEach(notif => { 
-                        let targetUrl = '#';
-                        if (notif.title === 'Pesan Baru') targetUrl = '/chat/inbox';
-                        else if (notif.title === 'Pesanan Baru Masuk') targetUrl = '/orders/incoming-orders';
-                        else if (notif.title === 'Pembaruan Status Pesanan') targetUrl = '/orders/my-orders'; 
-                    %>
-                        <div class="list-group-item p-3 <%= notif.isRead ? 'bg-white' : 'bg-light border-start border-4 border-primary' %> position-relative">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <a href="<%= targetUrl %>" class="text-decoration-none stretched-link">
-                                        <h6 class="fw-bold mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>"><%= notif.title %></h6>
-                                    </a>
-                                    <p class="mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>"><%= notif.message %></p>
-                                    <small class="text-muted"><%= new Date(notif.createdAt).toLocaleString('id-ID') %></small>
-                                </div>
-                                <% if (!notif.isRead) { %>
-                                    <form action="/notifications/<%= notif.id %>/read" method="POST" style="position: relative; z-index: 2;">
-                                        <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">Tandai Dibaca</button>
-                                    </form>
-                                <% } %>
-                            </div>
-                        </div>
-                    <% }) %>
-                <% } %>
+            <div class="alert alert-success">
+                <%= messages.success_msg %>
             </div>
-        </div>
-    </div>
+            <% } %>
 
-    <script src="/js/theme-toggle.js"></script>
+                <div class="card border-0 shadow-sm">
+                    <div class="list-group list-group-flush">
+                        <% if (notifications.length===0) { %>
+                            <div class="list-group-item p-4 text-center text-muted">
+                                Belum ada notifikasi.
+                            </div>
+                            <% } else { %>
+                                <% notifications.forEach(notif=> {
+                                    let targetUrl = '#';
+                                    if (notif.title === 'Pesan Baru') targetUrl = '/chat/inbox';
+                                    else if (notif.title === 'Pesanan Baru Masuk') targetUrl =
+                                    '/orders/incoming-orders';
+                                    else if (notif.title === 'Pembaruan Status Pesanan') targetUrl =
+                                    '/orders/my-orders';
+                                    %>
+                                    <div
+                                        class="list-group-item p-3 <%= notif.isRead ? 'bg-white' : 'bg-light border-start border-4 border-primary' %> position-relative">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <a href="<%= targetUrl %>" class="text-decoration-none stretched-link">
+                                                    <h6
+                                                        class="fw-bold mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>">
+                                                        <%= notif.title %>
+                                                    </h6>
+                                                </a>
+                                                <p class="mb-1 <%= notif.isRead ? 'text-secondary' : 'text-dark' %>">
+                                                    <%= notif.message %>
+                                                </p>
+                                                <small class="text-muted">
+                                                    <%= new Date(notif.createdAt).toLocaleString('id-ID') %>
+                                                </small>
+                                            </div>
+                                            <% if (!notif.isRead) { %>
+                                                <form action="/notifications/<%= notif.id %>/read" method="POST"
+                                                    style="position: relative; z-index: 2;">
+                                                    <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">Tandai
+                                                        Dibaca</button>
+                                                </form>
+                                                <% } %>
+                                        </div>
+                                    </div>
+                                    <% }) %>
+                                        <% } %>
+                    </div>
+                </div>
+    </div>
 </body>
+
 </html>

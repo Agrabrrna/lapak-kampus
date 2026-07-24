@@ -199,6 +199,38 @@ exports.processCheckout = async (req, res) => {
         });
       }
 
+      // Generate Midtrans Snap Token
+      const midtransClient = require('../services/midtrans');
+      const transactionDetails = {
+        transaction_details: {
+          order_id: order.id,
+          gross_amount: totalPrice
+        },
+        customer_details: {
+          first_name: req.session.user.name,
+          email: req.session.user.email
+        }
+      };
+
+      let snapToken = null;
+      try {
+        const transaction = await midtransClient.snap.createTransaction(transactionDetails);
+        snapToken = transaction.token;
+      } catch (err) {
+        console.error('Midtrans Snap Error:', err);
+        throw new Error('Gagal memproses pembayaran dengan payment gateway');
+      }
+
+      // 3. Create the Payment record
+      await tx.payment.create({
+        data: {
+          orderId: order.id,
+          amount: totalPrice,
+          status: 'PENDING',
+          midtransTransactionId: snapToken // store token here temporarily or use a new column, let's store it in midtransTransactionId for now to avoid schema changes
+        }
+      });
+
       return order;
     });
 
@@ -230,6 +262,7 @@ exports.buyerOrders = async (req, res) => {
       where: { buyerId: req.session.userId },
       include: {
         seller: { select: { name: true, phone: true } },
+        payment: true,
         orderDetails: {
           include: { product: { select: { name: true } } }
         }

@@ -31,6 +31,10 @@ app.use(session({
 // Flash middleware
 app.use(flash());
 
+// Mount payment routes before CSRF to allow webhooks
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/api', paymentRoutes);
+
 // CSRF Protection
 app.use(csrf());
 
@@ -41,6 +45,7 @@ app.use(async (req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   res.locals.user = req.session.user || null;
   res.locals.messages = req.flash();
+  res.locals.midtransClientKey = process.env.MIDTRANS_CLIENT_KEY;
   
   res.locals.unreadCount = 0;
   if (req.session.userId) {

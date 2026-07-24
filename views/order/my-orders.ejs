@@ -14,13 +14,18 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Midtrans Snap.js -->
+    <script type="text/javascript"
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="<%= midtransClientKey %>"></script>
 </head>
 <body class="bg-light">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/user/dashboard">KampusLapak</a>
-            <a href="/user/dashboard" class="btn btn-outline-light btn-sm">Kembali ke Dashboard</a>
+            <a href="/user/dashboard" class="btn btn-outline-primary btn-sm rounded-pill fw-bold px-4">Kembali ke Dashboard</a>
         </div>
     </nav>
 
@@ -37,19 +42,36 @@
         <% if (orders.length === 0) { %>
             <div class="card p-5 text-center border-0 shadow-sm">
                 <h4 class="text-muted">Anda belum memiliki pesanan.</h4>
-                <a href="/products" class="btn btn-primary mt-3 w-25 mx-auto">Mulai Belanja</a>
+                <a href="/products" class="btn btn-primary mt-3 w-25 mx-auto rounded-pill fw-bold">Mulai Belanja</a>
             </div>
         <% } else { %>
             <% orders.forEach(order => { %>
                 <div class="card mb-4 border-0 shadow-sm">
-                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                        <div>
+                    <div class="card-header bg-white py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                        <div class="mb-2 mb-md-0">
                             <span class="text-muted small">ID Pesanan: <%= order.id %></span>
                             <h6 class="mb-0 fw-bold mt-1">Penjual: <%= order.seller.name %></h6>
+                            
+                            <!-- Payment Status -->
+                            <% if (order.payment) { %>
+                                <div class="mt-2">
+                                    <small class="text-muted fw-bold me-2">Status Pembayaran:</small>
+                                    <% if (order.payment.status === 'PAID') { %>
+                                        <span class="badge bg-success status-badge"><i class="fas fa-check-circle me-1"></i> LUNAS</span>
+                                    <% } else if (order.payment.status === 'PENDING') { %>
+                                        <span class="badge bg-warning text-dark status-badge"><i class="fas fa-clock me-1"></i> MENUNGGU PEMBAYARAN</span>
+                                    <% } else if (order.payment.status === 'EXPIRED') { %>
+                                        <span class="badge bg-secondary status-badge"><i class="fas fa-times-circle me-1"></i> KEDALUWARSA</span>
+                                    <% } else { %>
+                                        <span class="badge bg-danger status-badge"><i class="fas fa-exclamation-circle me-1"></i> GAGAL</span>
+                                    <% } %>
+                                </div>
+                            <% } %>
                         </div>
                         <div>
+                            <small class="text-muted fw-bold me-2 d-block d-md-inline mb-1 mb-md-0">Status Order:</small>
                             <% if (order.status === 'PENDING') { %>
-                                <span class="badge bg-warning text-dark status-badge">Menunggu Diproses</span>
+                                <span class="badge bg-warning text-dark status-badge">Menunggu Konfirmasi</span>
                             <% } else if (order.status === 'DIPROSES') { %>
                                 <span class="badge bg-info text-dark status-badge">Sedang Diproses</span>
                             <% } else if (order.status === 'SELESAI') { %>
@@ -64,7 +86,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                 <div>
                                     <h6 class="mb-0">
-                                        <a href="/products/<%= detail.productId %>" class="text-dark text-decoration-none"><%= detail.product.name %></a>
+                                        <a href="/products/<%= detail.productId %>" class="text-dark text-decoration-none fw-bold"><%= detail.product.name %></a>
                                     </h6>
                                     <small class="text-muted"><%= detail.quantity %> x Rp <%= parseFloat(detail.price).toLocaleString('id-ID') %></small>
                                 </div>
@@ -77,26 +99,44 @@
                             </div>
                         <% }) %>
                         
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <h5 class="fw-bold mb-0">Total: Rp <%= parseFloat(order.totalPrice).toLocaleString('id-ID') %></h5>
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mt-3">
+                            <h5 class="fw-bold mb-3 mb-md-0 text-primary">Total: Rp <%= parseFloat(order.totalPrice).toLocaleString('id-ID') %></h5>
                             
                             <!-- Action Buttons based on status -->
-                            <div class="d-flex gap-2">
-                                <% if (order.status === 'PENDING') { %>
+                            <div class="d-flex flex-wrap gap-2">
+                                
+                                <!-- Payment Actions -->
+                                <% if (order.payment && order.payment.status === 'PENDING') { %>
+                                    <button class="btn btn-primary btn-sm fw-bold shadow-sm" onclick="payWithSnap('<%= order.payment.midtransTransactionId %>')">
+                                        <i class="fas fa-credit-card me-1"></i> Bayar Sekarang
+                                    </button>
+                                    
+                                    <form action="/api/payment/check-status/<%= order.id %>" method="POST" class="d-inline">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm fw-bold" title="Tarik status terbaru dari server Midtrans jika webhook terhambat">
+                                            <i class="fas fa-sync-alt me-1"></i> Cek Status
+                                        </button>
+                                    </form>
+                                <% } %>
+
+                                <!-- Order Actions -->
+                                <% if (order.status === 'PENDING' && (!order.payment || order.payment.status === 'PENDING' || order.payment.status === 'EXPIRED')) { %>
                                     <form action="/orders/<%= order.id %>/status" method="POST" onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?');">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <input type="hidden" name="newStatus" value="DIBATALKAN">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">Batalkan Pesanan</button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm fw-bold shadow-sm">Batalkan Pesanan</button>
                                     </form>
                                 <% } %>
                                 <% if (order.status === 'DIPROSES') { %>
                                     <form action="/orders/<%= order.id %>/status" method="POST">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <input type="hidden" name="newStatus" value="SELESAI">
-                                        <button type="submit" class="btn btn-success btn-sm fw-bold">Pesanan Diterima</button>
+                                        <button type="submit" class="btn btn-success btn-sm fw-bold shadow-sm">Pesanan Diterima</button>
                                     </form>
                                 <% } %>
-                                <a href="https://wa.me/<%= order.seller.phone ? order.seller.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-outline-success btn-sm fw-bold">Hubungi Penjual</a>
+                                <a href="https://wa.me/<%= order.seller.phone ? order.seller.phone.replace(/[^0-9]/g, '') : '' %>" target="_blank" class="btn btn-outline-success btn-sm fw-bold shadow-sm">
+                                    <i class="fab fa-whatsapp me-1"></i> Hubungi Penjual
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -105,6 +145,34 @@
         <% } %>
     </div>
 
+    <!-- Snap integration logic -->
+    <script>
+        function payWithSnap(snapToken) {
+            if (!snapToken) {
+                alert('Token pembayaran tidak valid.');
+                return;
+            }
+            
+            snap.pay(snapToken, {
+                onSuccess: function(result){
+                    alert("Pembayaran berhasil!");
+                    window.location.reload();
+                },
+                onPending: function(result){
+                    alert("Menunggu pembayaran Anda!");
+                    window.location.reload();
+                },
+                onError: function(result){
+                    alert("Pembayaran gagal!");
+                    window.location.reload();
+                },
+                onClose: function(){
+                    console.log('Customer closed the popup without finishing the payment');
+                }
+            });
+        }
+    </script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/theme-toggle.js"></script>
 </body>
 </html>
