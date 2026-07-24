@@ -1,7 +1,6 @@
 const prisma = require('../services/db');
 const { validationResult } = require('express-validator');
-const fs = require('fs');
-const path = require('path');
+const { uploadStream, deleteImage, getPublicIdFromUrl } = require('../services/cloudinary');
 
 // Helper to seed categories if empty
 const ensureCategoriesExist = async () => {
@@ -75,13 +74,7 @@ const postAddProduct = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    // Delete uploaded files if validation fails
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-    }
-
+    // Note: No local file cleanup needed as multer uses memory storage
     return res.render('seller/add-product', {
       title: 'Tambah Produk - KampusLapak',
       categories,
@@ -109,13 +102,14 @@ const postAddProduct = async (req, res) => {
       }
     });
 
-    // Save product images
+    // Save product images to Cloudinary
     if (req.files && req.files.length > 0) {
-      const imagePromises = req.files.map((file, index) => {
+      const imagePromises = req.files.map(async (file, index) => {
+        const uploadResult = await uploadStream(file.buffer, 'kampuslapak/products');
         return prisma.productImage.create({
           data: {
             productId: product.id,
-            imagePath: '/uploads/' + file.filename,
+            imagePath: uploadResult.secure_url,
             isPrimary: index === 0 // Mark the first uploaded image as primary
           }
         });
@@ -139,12 +133,6 @@ const postAddProduct = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    // Cleanup uploads on error
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-    }
     res.render('seller/add-product', {
       title: 'Tambah Produk - KampusLapak',
       categories,
@@ -199,12 +187,6 @@ const postEditProduct = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-    }
-
     return res.render('seller/edit-product', {
       title: 'Edit Produk - KampusLapak',
       categories,
@@ -232,16 +214,17 @@ const postEditProduct = async (req, res) => {
       }
     });
 
-    // Handle new image uploads if any
+    // Handle new image uploads to Cloudinary if any
     if (req.files && req.files.length > 0) {
       // Check if product already has primary image
       const hasPrimary = product.images.some(img => img.isPrimary);
 
-      const imagePromises = req.files.map((file, index) => {
+      const imagePromises = req.files.map(async (file, index) => {
+        const uploadResult = await uploadStream(file.buffer, 'kampuslapak/products');
         return prisma.productImage.create({
           data: {
             productId: product.id,
-            imagePath: '/uploads/' + file.filename,
+            imagePath: uploadResult.secure_url,
             isPrimary: !hasPrimary && index === 0 // only make primary if there's no existing primary image
           }
         });
@@ -278,11 +261,6 @@ const postEditProduct = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    if (req.files) {
-      req.files.forEach(file => {
-        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
-      });
-    }
     res.render('seller/edit-product', {
       title: 'Edit Produk - KampusLapak',
       categories,
@@ -306,13 +284,15 @@ const postDeleteProduct = async (req, res) => {
       return res.status(404).send('Produk tidak ditemukan atau Anda tidak memiliki akses.');
     }
 
-    // Delete physically associated image files
-    product.images.forEach(img => {
-      const fullPath = path.join(__dirname, '../../public', img.imagePath);
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
+    // Delete associated image files from Cloudinary
+    const deletePromises = product.images.map(img => {
+      const publicId = getPublicIdFromUrl(img.imagePath);
+      if (publicId) {
+        return deleteImage(publicId).catch(err => console.error('Gagal menghapus gambar dari Cloudinary:', err));
       }
+      return Promise.resolve();
     });
+    await Promise.all(deletePromises);
 
     // Delete image records first (due to relations)
     await prisma.productImage.deleteMany({
